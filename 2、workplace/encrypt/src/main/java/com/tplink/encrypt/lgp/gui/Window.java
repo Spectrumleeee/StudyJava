@@ -17,8 +17,6 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JSplitPane;
 import javax.swing.JLabel;
-import javax.swing.UIManager;
-
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -35,15 +33,6 @@ public class Window extends JFrame {
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
-            	
-                try {
-                    JFrame.setDefaultLookAndFeelDecorated(true);
-                    UIManager
-                            .setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            	
                 try {
                     Window frame = new Window();
                     frame.setVisible(true);

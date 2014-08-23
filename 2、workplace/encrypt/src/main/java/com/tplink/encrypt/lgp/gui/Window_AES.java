@@ -14,18 +14,15 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JTextField;
 import javax.swing.JSplitPane;
-import javax.swing.UIManager;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
 import javax.swing.JTextArea;
-
 import java.awt.Color;
 
 public class Window_AES extends JFrame {
@@ -55,15 +52,6 @@ public class Window_AES extends JFrame {
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
-                try {
-                    JFrame.setDefaultLookAndFeelDecorated(true);
-                    JDialog.setDefaultLookAndFeelDecorated(true);
-                    UIManager
-                            .setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            	
                 try {
                     Window_AES frame = new Window_AES();
                     frame.setTitle("File Encrypt|Decrypt Tool Based On Java AES");

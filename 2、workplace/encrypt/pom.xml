@@ -26,10 +26,5 @@
     	<artifactId>bcprov-jdk15</artifactId>
     	<version>140</version>
     </dependency>
-    <dependency>
-    	<groupId>ch.randelshofer.quaqua</groupId>
-    	<artifactId>quaqua</artifactId>
-    	<version>1.0.0</version>
-    </dependency>
   </dependencies>
 </project>
