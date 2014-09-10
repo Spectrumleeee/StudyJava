@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile=abc-1.0.jar -DgroupId=com.xmu.cs.lgp -DartifactId=abc -Dversion=1.0 -Dpackaging=jar
