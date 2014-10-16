@@ -1,0 +1,9 @@
+Forward & Redirect & Request.getParameter & Request.getAttribute 理解
+上次为了防止页面form表单当浏览器回退刷新时的重复提交而使用PRG(Post-Redirect-Get),但是重定向Redirect存在一个特点，比如Controller中使用ModelMap实例添加一个属性errorMsg，然后重定向到一个页面fail.jsp，浏览器在重定向的页面fail.jsp中通过request.getAttribute("errorMsg")返回的是null，因为redirect的两个页面之间的信息是无法直接传递的，但是ModelMap中的属性errorMsg却会以url参数的形式添加在url中，即fail.jsp?errorMsg=XXXX,所以在fail.jsp中可以通过request.getParameter("errorMsg")获取errorMsg的值。
+
+getAttribute是返回对象,getParameter返回字符串
+总的来说：request.getAttribute()方法返回request范围内存在的对象，而request.getParameter()方法是获取http提交过来的数据。
+
+http://blog.sina.com.cn/s/blog_5dbdb9780100bfba.html
+
+JSP+JQuery+AJAX页面继承include模板页面开发
