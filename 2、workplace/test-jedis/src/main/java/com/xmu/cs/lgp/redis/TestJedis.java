@@ -19,12 +19,7 @@
  */
 package com.xmu.cs.lgp.redis;
 
-import java.util.HashSet;
 import java.util.Scanner;
-import java.util.Set;
-
-import redis.clients.jedis.HostAndPort;
-import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.exceptions.JedisClusterMaxRedirectionsException;
 
 /**
@@ -34,14 +29,21 @@ import redis.clients.jedis.exceptions.JedisClusterMaxRedirectionsException;
  * Author: liguangpu <liguangpu@tp-link.net>
  * Created: Nov 12, 2014
  */
-public class TestJedis {
-    public static void main(String[] args) {
+public class TestJedis extends Jedis{
+    
+    public TestJedis(String ip, int port) {
+        super(ip, port);
+    }
 
-        String value = "abc";
-        Set<HostAndPort> jedisClusterNodes = new HashSet<HostAndPort>();
-        // Jedis Cluster will attempt to discover cluster nodes automatically
-        jedisClusterNodes.add(new HostAndPort("172.29.88.117", 7000));
-        JedisCluster jc = new JedisCluster(jedisClusterNodes);
+    public static void main(String[] args) {
+        
+        TestJedis jc = new TestJedis("172.29.88.117", 7000);
+        
+        SetGetShell(jc);
+    }
+    
+    public static void SetGetShell(TestJedis jc){
+        String value = "haliluya";
         Scanner scan = new Scanner(System.in);
         try {
             while (true) {
@@ -73,3 +75,4 @@ public class TestJedis {
         }
     }
 }
+
