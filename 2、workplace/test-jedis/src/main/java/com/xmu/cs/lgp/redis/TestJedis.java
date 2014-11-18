@@ -19,7 +19,11 @@
  */
 package com.xmu.cs.lgp.redis;
 
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
+
+import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.exceptions.JedisClusterMaxRedirectionsException;
 
 /**
@@ -31,14 +35,16 @@ import redis.clients.jedis.exceptions.JedisClusterMaxRedirectionsException;
  */
 public class TestJedis extends Jedis{
     
-    public TestJedis(String ip, int port) {
-        super(ip, port);
+    public TestJedis(Set<HostAndPort> jedisClusterNodes) {
+        super(jedisClusterNodes);
     }
 
     public static void main(String[] args) {
         
-        TestJedis jc = new TestJedis("172.29.88.117", 7000);
-        
+        Set<HostAndPort> jedisClusterNodes = new HashSet<HostAndPort>();
+        jedisClusterNodes.add(new HostAndPort("172.29.88.117", 7000));
+        jedisClusterNodes.add(new HostAndPort("172.29.88.117", 7001));
+        TestJedis jc = new TestJedis(jedisClusterNodes);
         SetGetShell(jc);
     }
     
@@ -64,9 +70,11 @@ public class TestJedis extends Jedis{
                 }
             }
         }catch(JedisClusterMaxRedirectionsException e){ 
+            e.printStackTrace();
             System.out.println("## Too many Cluster redirections, check your network, exit~~! ");
             return;
         }catch(Exception e){
+            e.printStackTrace();
             System.out.println("## input error exit~~! ");
             return;
         }finally {

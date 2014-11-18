@@ -19,7 +19,6 @@
  */
 package com.xmu.cs.lgp.redis;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import redis.clients.jedis.HostAndPort;
@@ -34,11 +33,10 @@ import redis.clients.jedis.JedisCluster;
  */
 public class Jedis {
     private JedisCluster jc = null;
-    
-    public Jedis(String ip, int port){
-        Set<HostAndPort> jedisClusterNodes = new HashSet<HostAndPort>();
+
+    public Jedis(Set<HostAndPort> jedisClusterNodes){
+
         // Jedis Cluster will attempt to discover cluster nodes automatically
-        jedisClusterNodes.add(new HostAndPort(ip, port));
         jc = new JedisCluster(jedisClusterNodes);
     }
     
