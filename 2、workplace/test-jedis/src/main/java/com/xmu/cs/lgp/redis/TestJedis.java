@@ -32,7 +32,7 @@ import redis.clients.jedis.exceptions.JedisClusterMaxRedirectionsException;
  * Copyright (c) 2014, TP-Link Co.,Ltd. Author: liguangpu
  * <liguangpu@tp-link.net> Created: Nov 12, 2014
  */
-public class TestJedis extends Jedis {
+public class TestJedis extends MyJedis {
 
     public TestJedis(Set<HostAndPort> jedisClusterNodes) {
         super(jedisClusterNodes);
@@ -48,7 +48,8 @@ public class TestJedis extends Jedis {
         
         int nums = Integer.parseInt(args[0]);
         int con = Integer.parseInt(args[1]);
-        benchmark(jedisClusterNodes, nums, con);
+        int payload = args.length == 3 ? Integer.parseInt(args[2]) : 10 ;
+        benchmark(jedisClusterNodes, nums, con, payload);
     }
 
     public static void SetGetShell(TestJedis jc) {
@@ -88,13 +89,20 @@ public class TestJedis extends Jedis {
     }
 
     public static void benchmark(Set<HostAndPort> jedisClusterNodes, int requestnums,
-            int concurrent) {
+            int concurrent, int payload) {
         Thread th[] = new Thread[concurrent];
         long start = System.currentTimeMillis();
+        
         for (int i = 0; i < concurrent; i++) {
             TestJedis jc = new TestJedis(jedisClusterNodes);
+            StringBuilder payloaddata = new StringBuilder();
+
+            for(int j=0; j < payload; j++){
+                payloaddata.append((char)(Math.random()*26 + 65));
+            }
+            
             th[i] = new BenchmarkThread((new StringBuilder("BM-")).append(i)
-                    .toString(), jc, requestnums / concurrent);
+                    .toString(), jc, requestnums / concurrent, payloaddata);
         }
 
         for (int i = 0; i < concurrent; i++)
