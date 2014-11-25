@@ -28,27 +28,30 @@ import redis.clients.jedis.exceptions.JedisClusterMaxRedirectionsException;
 
 /**
  * TestJedis.java
- *
- * Copyright (c) 2014, TP-Link Co.,Ltd.
- * Author: liguangpu <liguangpu@tp-link.net>
- * Created: Nov 12, 2014
+ * 
+ * Copyright (c) 2014, TP-Link Co.,Ltd. Author: liguangpu
+ * <liguangpu@tp-link.net> Created: Nov 12, 2014
  */
-public class TestJedis extends Jedis{
-    
+public class TestJedis extends Jedis {
+
     public TestJedis(Set<HostAndPort> jedisClusterNodes) {
         super(jedisClusterNodes);
     }
 
     public static void main(String[] args) {
-        
+
         Set<HostAndPort> jedisClusterNodes = new HashSet<HostAndPort>();
         jedisClusterNodes.add(new HostAndPort("172.29.88.117", 7000));
         jedisClusterNodes.add(new HostAndPort("172.29.88.117", 7001));
-        TestJedis jc = new TestJedis(jedisClusterNodes);
-        SetGetShell(jc);
+//        TestJedis jc = new TestJedis(jedisClusterNodes);
+//        SetGetShell(jc);
+        
+        int nums = Integer.parseInt(args[0]);
+        int con = Integer.parseInt(args[1]);
+        benchmark(jedisClusterNodes, nums, con);
     }
-    
-    public static void SetGetShell(TestJedis jc){
+
+    public static void SetGetShell(TestJedis jc) {
         String value = "haliluya";
         Scanner scan = new Scanner(System.in);
         try {
@@ -69,18 +72,44 @@ public class TestJedis extends Jedis{
                     System.out.println("## input error~~! ");
                 }
             }
-        }catch(JedisClusterMaxRedirectionsException e){ 
+        } catch (JedisClusterMaxRedirectionsException e) {
             e.printStackTrace();
-            System.out.println("## Too many Cluster redirections, check your network, exit~~! ");
+            System.out
+                    .println("## Too many Cluster redirections, check your network, exit~~! ");
             return;
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             System.out.println("## input error exit~~! ");
             return;
-        }finally {
+        } finally {
             jc.close();
             scan.close();
         }
     }
-}
 
+    public static void benchmark(Set<HostAndPort> jedisClusterNodes, int requestnums,
+            int concurrent) {
+        Thread th[] = new Thread[concurrent];
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < concurrent; i++) {
+            TestJedis jc = new TestJedis(jedisClusterNodes);
+            th[i] = new BenchmarkThread((new StringBuilder("BM-")).append(i)
+                    .toString(), jc, requestnums / concurrent);
+        }
+
+        for (int i = 0; i < concurrent; i++)
+            th[i].start();
+
+        for (int i = 0; i < concurrent; i++)
+            try {
+                th[i].join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        long spent = System.currentTimeMillis() - start;
+        System.out.println((new StringBuilder("BenchMark stop ! \n"))
+                .append((long) (1000 * requestnums) / spent)
+                .append(" requests per sec").toString());
+    }
+}
