@@ -46,7 +46,7 @@ public class TestJedis extends MyJedis {
 //        TestJedis jc = new TestJedis(jedisClusterNodes);
 //        SetGetShell(jc);
         
-        int nums = Integer.parseInt(args[0]);
+        long nums = Long.parseLong(args[0]);
         int con = Integer.parseInt(args[1]);
         int payload = args.length == 3 ? Integer.parseInt(args[2]) : 10 ;
         benchmark(jedisClusterNodes, nums, con, payload);
@@ -88,11 +88,10 @@ public class TestJedis extends MyJedis {
         }
     }
 
-    public static void benchmark(Set<HostAndPort> jedisClusterNodes, int requestnums,
+    public static void benchmark(Set<HostAndPort> jedisClusterNodes, long requestnums,
             int concurrent, int payload) {
         Thread th[] = new Thread[concurrent];
-        long start = System.currentTimeMillis();
-        
+
         for (int i = 0; i < concurrent; i++) {
             TestJedis jc = new TestJedis(jedisClusterNodes);
             StringBuilder payloaddata = new StringBuilder();
@@ -105,6 +104,8 @@ public class TestJedis extends MyJedis {
                     .toString(), jc, requestnums / concurrent, payloaddata);
         }
 
+        long start = System.currentTimeMillis();
+        
         for (int i = 0; i < concurrent; i++)
             th[i].start();
 
