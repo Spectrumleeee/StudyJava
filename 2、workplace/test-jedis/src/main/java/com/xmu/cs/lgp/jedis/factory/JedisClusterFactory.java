@@ -40,11 +40,9 @@ public class JedisClusterFactory {
         Set<HostAndPort> jedisClusterNodes = configFromFile();
         JedisCluster jc = new JedisCluster(jedisClusterNodes);
         return jc;
-        
     }
 
     private static Set<HostAndPort> configFromFile() {
-//        System.out.println("hellow worlod haliluya!!");
         Set<HostAndPort> jedisClusterNodes = new HashSet<HostAndPort>();
         Properties props = new Properties();
         InputStream istream = null;
@@ -57,7 +55,6 @@ public class JedisClusterFactory {
             e.printStackTrace();
         }
 
-        System.out.println(props.get("nodes"));
         int nodeNums = Integer.parseInt((String) props.get("nodes"));
         String[] ipPort;
         for(int i=1; i<=nodeNums; i++){
