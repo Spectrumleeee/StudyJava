@@ -24,6 +24,8 @@ import java.net.InetSocketAddress;
 
 import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.future.ReadFuture;
+import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
@@ -46,10 +48,11 @@ public class MonitorClient {
 
     private static Logger logger = LoggerFactory.getLogger(MonitorClient.class);
 
-    private static final int DEFAULT_CONNECT_TIMEOUT = 10;
+    private static final int DEFAULT_CONNECT_TIMEOUT = 1800;
     private static final int PORT = 9999;
     private static final String HOST = "localhost";
     private SocketConnector socketConnector;
+    private IoHandlerAdapter ioHandler;
     private SocketSessionConfig sessionConfig;
     private InetSocketAddress serverAddr;
     private IoSession session;
@@ -59,7 +62,6 @@ public class MonitorClient {
     }
 
     public void init() {
-
         socketConnector = new NioSocketConnector();
         serverAddr = new InetSocketAddress(HOST, PORT);
         sessionConfig = socketConnector.getSessionConfig();
@@ -67,10 +69,10 @@ public class MonitorClient {
         sessionConfig.setBothIdleTime(DEFAULT_CONNECT_TIMEOUT);
         // close the tcp connection without step into TIME_WAIT
         sessionConfig.setSoLinger(0);
+        sessionConfig.setUseReadOperation(true);
         socketConnector.getFilterChain().addLast("codec",
                 new ProtocolCodecFilter(new TextLineCodecFactory()));
-
-        ClientMessageHandler ioHandler = new ClientMessageHandler();
+        ioHandler = new ClientMessageHandler();
         socketConnector.setHandler(ioHandler);
     }
 
@@ -78,46 +80,76 @@ public class MonitorClient {
         this.serverAddr = new InetSocketAddress(host, port);
     }
 
-    public void sendMessage(final String msg) {
-
-        if (null == session) {
+    public String sendMessage(final String msg) {
+        String message = "FAIL";
+        /*
+         * we should establish a connection when the session is null at first 
+         * or an established connection is not connected anymore
+         */
+        if (null == session || !session.isConnected()) {
             ConnectFuture cf = socketConnector.connect(serverAddr);
             cf.awaitUninterruptibly();
             session = cf.getSession();
         }
         try {
             session.write(msg);
-            
-            logger.info("Send message: [ " + msg + " ]");
+            logger.info("Send message: [ " + msg + " ]"); 
         } catch (RuntimeIoException e) {
             if (e.getCause() instanceof ConnectException) {
                 if(session != null){
                     session.close(true);
                     session = null;
+                    return message;
                 }
             }
         }
+        
+        if(!session.isConnected()){
+            session = null;
+            return message;
+        }
+        try {
+            ReadFuture readFuture = session.read();
+            // this read timeout should be longer if the network is not good 
+            readFuture.await(2000);
+            message = (String)readFuture.getMessage();
+            logger.info("Read message: [ " + message + " ]"); 
+        } catch (InterruptedException e) {
+        } finally{
+            /*
+             * finally we should check the message we received is not null and
+             * we must set the session null when it was not connected anymore so
+             * we could get a new connection session next time
+             */
+            if(message == null || !session.isConnected()){
+                message = "FAIL";
+                session = null;
+            }
+        }
+        
+        return message;
     }
+    
     public static void mySleep(int secs){
         try {
-            Thread.sleep(secs*1000);
+            Thread.sleep(1000*secs);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
+    
     public static void main(String[] args) throws InterruptedException {
         MonitorClient client = new MonitorClient();
         MonitorClient client1 = new MonitorClient();
         MonitorClient client2 = new MonitorClient();
         client.setServerAddress("localhost", 9999);
-
+        
         client.sendMessage("getSlotsInfo");
-
+        
         client1.sendMessage("getMemoryInfo");
         
         client2.sendMessage("Welcome to Mina");
-
+        
         mySleep(2);
         System.exit(0);
     }

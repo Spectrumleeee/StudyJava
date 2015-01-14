@@ -78,7 +78,7 @@ public class MigrateDialog extends JDialog {
         Dimension scrSize = Toolkit.getDefaultToolkit().getScreenSize();
         int screenWidth = scrSize.width;
         int screenHeight = scrSize.height;
-        setBounds((screenWidth - 450) / 2, (screenHeight - 300) / 2, 500, 200);
+        setBounds((screenWidth - 450) / 2, (screenHeight - 300) / 2, 300, 200);
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setLayout(new GridLayout(3, 1));
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));

@@ -19,30 +19,51 @@
  */
 package com.xmu.cs.lgp.redis.cluster.executor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.json.JSONObject;
 
 import com.xmu.cs.lgp.redis.cluster.tools.JedisTools;
 import com.xmu.cs.lgp.redis.cluster.tools.RedisClusterProxy;
 
 /**
- * SlotsExecutor.java
+ * MigrateExecutor.java
  *
  * Copyright (c) 2014, TP-Link Co.,Ltd.
  * Author: liguangpu <liguangpu@tp-link.net>
- * Created: Jan 12, 2015
+ * Created: Jan 13, 2015
  */
-public class SlotsExecutor implements CommandExecutor {
+public class MigrateExecutor implements CommandExecutor {
 
+    private Map<String,String> params;
+    private JedisTools jtl;
+    
+    public MigrateExecutor(Map<String, String> params){
+        this.params = params;
+    }
     @Override
     public JSONObject execute(RedisClusterProxy proxy) {
-        Object[][] rst = proxy.getJedisTools().getSlotsInfo();
+        jtl = new JedisTools(new Object());
         JSONObject jsonobj = new JSONObject();
-        for(int i=0; i<rst.length; i++)
-            jsonobj.put((String) rst[i][0], rst[i][1]);
+        for(String key : params.keySet()){
+            jsonobj.put(key, params.get(key));
+        }
+        System.out.println(jsonobj.toString());
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return jsonobj;
     }
     
-    public static void main(String[] args) {
-
+    public static void main(String[] args){
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("param-1", "127.0.0.1:7001");
+        params.put("param-2", "127.0.0.1:7002");
+        params.put("param-3", "24");
+        MigrateExecutor me = new MigrateExecutor(params);
+        me.execute(null);
     }
 }

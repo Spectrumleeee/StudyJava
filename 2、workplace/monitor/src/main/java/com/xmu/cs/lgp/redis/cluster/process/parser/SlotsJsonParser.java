@@ -17,32 +17,37 @@
  *  under the License.
  *
  */
-package com.xmu.cs.lgp.redis.cluster.executor;
+package com.xmu.cs.lgp.redis.cluster.process.parser;
+
+import java.util.Set;
 
 import org.json.JSONObject;
 
-import com.xmu.cs.lgp.redis.cluster.tools.JedisTools;
-import com.xmu.cs.lgp.redis.cluster.tools.RedisClusterProxy;
-
 /**
- * SlotsExecutor.java
+ * SlotsJsonParser.java
  *
  * Copyright (c) 2014, TP-Link Co.,Ltd.
  * Author: liguangpu <liguangpu@tp-link.net>
  * Created: Jan 12, 2015
  */
-public class SlotsExecutor implements CommandExecutor {
+public class SlotsJsonParser extends JsonParser {
 
     @Override
-    public JSONObject execute(RedisClusterProxy proxy) {
-        Object[][] rst = proxy.getJedisTools().getSlotsInfo();
-        JSONObject jsonobj = new JSONObject();
-        for(int i=0; i<rst.length; i++)
-            jsonobj.put((String) rst[i][0], rst[i][1]);
-        return jsonobj;
+    public Object[][] parse(String str) {
+        if(str.equals("FAIL"))
+            return null;
+        
+        JSONObject obj = new JSONObject(str);
+        Set<String> keys = obj.keySet();
+        int rows = keys.size();
+        rstObj = new Object[rows][2];
+        int index = 0;
+        for(String key : keys){
+            rstObj[index][0] = key;
+            rstObj[index++][1] = obj.get(key);
+        }
+        
+        return rstObj;
     }
-    
-    public static void main(String[] args) {
 
-    }
 }

@@ -21,7 +21,7 @@ package com.xmu.cs.lgp.redis.cluster.executor;
 
 import org.json.JSONObject;
 
-import com.xmu.cs.lgp.redis.cluster.tools.JedisTools;
+import com.xmu.cs.lgp.redis.cluster.tools.RedisClusterProxy;
 
 /**
  * CommandExecutor.java
@@ -31,5 +31,5 @@ import com.xmu.cs.lgp.redis.cluster.tools.JedisTools;
  * Created: Jan 12, 2015
  */
 public interface CommandExecutor {
-    public JSONObject execute(JedisTools jtl);
+    public JSONObject execute(RedisClusterProxy proxy);
 }

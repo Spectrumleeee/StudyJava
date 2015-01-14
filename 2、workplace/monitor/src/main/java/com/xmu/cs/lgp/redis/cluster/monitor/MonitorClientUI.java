@@ -45,13 +45,20 @@ import javax.swing.RowSorter;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Set;
 
 import javax.swing.JMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
 
+import org.json.JSONObject;
+
 import com.xmu.cs.lgp.redis.cluster.operation.migrate.MigrateDialog;
 import com.xmu.cs.lgp.redis.cluster.operation.migrate.MigrateStructure;
+import com.xmu.cs.lgp.redis.cluster.operation.migrate.MigrateViewDialog;
+import com.xmu.cs.lgp.redis.cluster.process.parser.JsonParser;
+import com.xmu.cs.lgp.redis.cluster.process.parser.MemoryJsonParser;
+import com.xmu.cs.lgp.redis.cluster.process.parser.SlotsJsonParser;
 import com.xmu.cs.lgp.redis.cluster.tools.JedisTools;
 import com.xmu.cs.lgp.redis.cluster.tools.RefreshThread;
 
@@ -61,13 +68,13 @@ import com.xmu.cs.lgp.redis.cluster.tools.RefreshThread;
  * Copyright (c) 2014, TP-Link Co.,Ltd. Author: liguangpu
  * <liguangpu@tp-link.net> Created: Dec 15, 2014
  */
-public class MonitorUI extends JFrame {
+public class MonitorClientUI extends JFrame {
 
     /*
-     * This UI program can show the redis cluster memory/slots info
-     * It connects to the redis cluster directly.
+     * This UI program can show the redis cluster memory/slots info It connects
+     * to the MonitorServer , which is a RedisClusterProxy Server
      */
-    
+
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
     private JPanel northPane;
@@ -79,15 +86,16 @@ public class MonitorUI extends JFrame {
     private CardLayout layout;
     private String[] columnNames = { "Node", "Node-status", "Mem-used",
             "Mem-used-peak", "MaxMemory", "Percent(used/max)" };
-    private JedisTools jd;
+    private JedisTools jtl;
     private JButton btnMigrate;
     private Object lock = new Object();
     private JLabel lblSourceNode;
     private JComboBox<String> cbxSource;
     private JLabel lblTargetNode;
     private JComboBox<String> cbxTarget;
-    private MigrateDialog migrateDialog;
+    private MigrateViewDialog migrateDialog;
     private Object[][] data;
+    private MonitorClient client;
 
     /**
      * Launch the application.
@@ -96,7 +104,7 @@ public class MonitorUI extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    MonitorUI frame = new MonitorUI();
+                    MonitorClientUI frame = new MonitorClientUI();
                     frame.setTitle("Redis Cluster Monitor");
                     frame.setVisible(true);
                 } catch (Exception e) {
@@ -109,7 +117,8 @@ public class MonitorUI extends JFrame {
     /**
      * Create the frame.
      */
-    public MonitorUI() {
+    public MonitorClientUI() {
+        client = new MonitorClient();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Dimension scrSize = Toolkit.getDefaultToolkit().getScreenSize();
         int screenWidth = scrSize.width;
@@ -132,7 +141,6 @@ public class MonitorUI extends JFrame {
         JMenuItem mntmRedisVersion = new JMenuItem("Redis Version");
         mntmRedisVersion.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
             }
         });
 
@@ -166,9 +174,12 @@ public class MonitorUI extends JFrame {
                 migrateStructure.setSource((String) cbxSource.getSelectedItem());
                 migrateStructure.setTarget((String) cbxTarget.getSelectedItem());
 
-                migrateDialog = new MigrateDialog(jd, lock, btnMigrate,
-                        migrateStructure);
+                // migrateDialog = new MigrateDialog(jtl, lock, btnMigrate,
+                // migrateStructure);
+                migrateDialog = new MigrateViewDialog(migrateStructure, client,
+                        btnMigrate);
                 migrateDialog.setTitle("Slots Migrating");
+                migrateDialog.setResizable(false);
                 migrateDialog.setVisible(true);
                 btnMigrate.setEnabled(false);
                 // updateSlotTable(false);
@@ -232,8 +243,8 @@ public class MonitorUI extends JFrame {
      * Initiate the memory table
      */
     public void initMemoryTable() {
-        jd = new JedisTools(lock);
-        new RefreshThread(jd, lock).start();
+        jtl = new JedisTools(lock);
+        new RefreshThread(jtl, lock).start();
 
         Object[][] data = {
                 { "Kathy", "OK", "Smith", "Snowboarding", new Integer(5),
@@ -295,7 +306,15 @@ public class MonitorUI extends JFrame {
      */
     public void updateSlotTable(boolean initSourceTarget) {
         String[] columnNames = { "Node", "Slot" };
-        data = jd.getSlotsInfo();
+        String rst;
+        try {
+            rst = client.sendMessage("getSlotsInfo");
+        } catch (Exception e) {
+            return;
+        }
+        JsonParser jp = new SlotsJsonParser();
+        data = jp.parse(rst);
+        // data = jtl.getSlotsInfo();
         TableModel model = new DefaultTableModel(data, columnNames);
         slotsTable.setModel(model);
         if (initSourceTarget)
@@ -306,8 +325,17 @@ public class MonitorUI extends JFrame {
      * Update the memory info table
      */
     public void updateMemoryTable() {
-        DefaultTableModel tableModel = new DefaultTableModel(
-                jd.getMemoryInfo(), columnNames);
+
+        String rst;
+        try {
+            rst = client.sendMessage("getMemoryInfo");
+        } catch (Exception e) {
+            return;
+        }
+        JsonParser jp = new MemoryJsonParser();
+        Object[][] data = jp.parse(rst);
+        // data = jtl.getMemoryInfo();
+        DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
         RowSorter<TableModel> sorter = new TableRowSorter<TableModel>(
                 tableModel);
         // table.setAutoCreateRowSorter(true);

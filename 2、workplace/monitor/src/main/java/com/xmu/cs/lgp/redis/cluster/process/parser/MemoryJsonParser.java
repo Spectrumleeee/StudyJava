@@ -17,34 +17,47 @@
  *  under the License.
  *
  */
-package com.xmu.cs.lgp.redis.cluster.executor;
+package com.xmu.cs.lgp.redis.cluster.process.parser;
+
+import java.util.Set;
 
 import org.json.JSONObject;
 
-import com.xmu.cs.lgp.redis.cluster.tools.JedisTools;
-import com.xmu.cs.lgp.redis.cluster.tools.RedisClusterProxy;
-
 /**
- * MemoryExecutor.java
+ * MemoryJsonParser.java
  *
  * Copyright (c) 2014, TP-Link Co.,Ltd.
  * Author: liguangpu <liguangpu@tp-link.net>
  * Created: Jan 12, 2015
  */
-public class MemoryExecutor implements CommandExecutor {
+public class MemoryJsonParser extends JsonParser {
 
     @Override
-    public JSONObject execute(RedisClusterProxy proxy) {
-        Object[][] rst = proxy.getJedisTools().getMemoryInfo();
-        JSONObject jsonobj = new JSONObject();
-        for(int i=0; i<rst.length; i++){
-            String value = "";
-            int j = 1;
-            for(j=1; j<rst[i].length - 1; j++)
-                value = value + rst[i][j] + "#";
-            value += rst[i][j];
-            jsonobj.put((String) rst[i][0], value);
+    public Object[][] parse(String str) {
+        if(str.equals("FAIL"))
+            return null;
+        
+        JSONObject obj = new JSONObject(str);
+        Set<String> keys = obj.keySet();
+        int rows = keys.size();
+        rstObj = new Object[rows][6];
+        int index = 0;
+        for(String key : keys){
+            rstObj[index][0] = key;
+            String temp = obj.getString(key);
+            String[] tmp = temp.split("#");
+            rstObj[index][1] = tmp[0];
+            if(tmp[0].equals("FAIL")){
+                index++;
+                continue;
+            }
+            rstObj[index][2] = tmp[1];
+            rstObj[index][3] = tmp[2];
+            rstObj[index][4] = tmp[3];
+            rstObj[index++][5] = Float.parseFloat(tmp[4]);
         }
-        return jsonobj;
+        
+        return rstObj;
     }
+
 }

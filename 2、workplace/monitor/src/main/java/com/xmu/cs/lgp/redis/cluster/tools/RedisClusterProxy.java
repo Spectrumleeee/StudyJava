@@ -19,35 +19,60 @@
  */
 package com.xmu.cs.lgp.redis.cluster.tools;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.json.JSONObject;
 
 import com.xmu.cs.lgp.redis.cluster.executor.CommandExecutor;
+import com.xmu.cs.lgp.redis.cluster.executor.MigrateExecutor;
 
 /**
  * RedisClusterProxy.java
- *
- * Copyright (c) 2014, TP-Link Co.,Ltd.
- * Author: liguangpu <liguangpu@tp-link.net>
- * Created: Jan 12, 2015
+ * 
+ * Copyright (c) 2014, TP-Link Co.,Ltd. Author: liguangpu
+ * <liguangpu@tp-link.net> Created: Jan 12, 2015
  */
 public class RedisClusterProxy {
 
     private JedisTools jtl;
     private static RefreshThread rt;
     private static Object lock = new Object();
-    
-    public RedisClusterProxy(){
+    private final ConcurrentLinkedQueue<CommandExecutor> blockQueue;
+    private final JSONObject ANOTHER_RUNNING;
+
+    public RedisClusterProxy() {
+        blockQueue = new ConcurrentLinkedQueue<CommandExecutor>();
+        ANOTHER_RUNNING = new JSONObject().put("ErrMsg",
+                "Another Migrate Operation is Running!");
         jtl = new JedisTools(lock);
         rt = new RefreshThread(jtl, lock);
         rt.start();
     }
     
-    public JSONObject execute(CommandExecutor ce){
-        return ce.execute(jtl);
+    public JedisTools getJedisTools(){
+        return jtl;
     }
-    
+
+    public JSONObject execute(CommandExecutor ce) {
+        if (ce instanceof MigrateExecutor) {
+            synchronized (blockQueue) {
+                if (blockQueue.isEmpty()) {
+                    blockQueue.add(ce);
+                } else
+                    return ANOTHER_RUNNING;
+            }
+            try {
+                return blockQueue.peek().execute(this);
+            } finally {
+                blockQueue.poll();
+            }
+        }
+
+        return ce.execute(this);
+    }
+
     public static void main(String[] args) {
-        
+
     }
 
 }

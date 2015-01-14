@@ -70,8 +70,9 @@ public class MigrateStructure{
     }
     
     public boolean checkInputSlotsNums(String slotsNums){
+        char[] slots = slotsNums.toCharArray();
         if (slotsNums.length() == 0 || (slotsNums.length() > 1
-                && slotsNums.toCharArray()[0] == '0')) {
+                && slots[0] == '0') || slots[0] == '<') {
             System.err.println("[INFO] input error, invalid slot num!!");
             return false;
         }

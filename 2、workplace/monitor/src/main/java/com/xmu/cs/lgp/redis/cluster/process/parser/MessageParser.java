@@ -24,6 +24,7 @@ import java.util.Map;
 
 import com.xmu.cs.lgp.redis.cluster.executor.CommandExecutor;
 import com.xmu.cs.lgp.redis.cluster.executor.MemoryExecutor;
+import com.xmu.cs.lgp.redis.cluster.executor.MigrateExecutor;
 import com.xmu.cs.lgp.redis.cluster.executor.SlotsExecutor;
 
 /**
@@ -41,7 +42,10 @@ public class MessageParser {
     public MessageParser(){
         params = new HashMap<String, String>();
     }
-    
+    /*
+     * request message style :  
+     * `command#arg1=val1#arg2=val2` or `command#val1#arg2=val2`
+     */
     public CommandExecutor parseMessage(String str){
         CommandExecutor ce = null ;
         
@@ -55,6 +59,8 @@ public class MessageParser {
             ce = new SlotsExecutor();
         else if(command.equals("getMemoryInfo"))
             ce = new MemoryExecutor();
+        else if(command.equals("migrate"))
+            ce = new MigrateExecutor(params);
         
         return ce;
     }
@@ -69,7 +75,7 @@ public class MessageParser {
                 params.put(param[0], param[1]);
             }
             else if(param.length == 1){
-                params.put("param", param[0]);
+                params.put("param-"+i, param[0]);
             }
             else
                 throw new Exception();

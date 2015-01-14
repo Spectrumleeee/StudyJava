@@ -21,6 +21,7 @@ package com.xmu.cs.lgp.redis.cluster.operation.migrate;
 
 import javax.swing.JButton;
 
+import com.xmu.cs.lgp.redis.cluster.monitor.MonitorClient;
 import com.xmu.cs.lgp.redis.cluster.tools.JedisTools;
 
 /**
@@ -41,6 +42,11 @@ public class MigrateThread extends Thread {
         this.lock = lock;
         this.jb = jb;
         this.migrateStructure = migrateStructure;
+    }
+
+    public MigrateThread(JButton okButton, MigrateStructure migrateStructure2,
+            MonitorClient monitorClient) {
+        
     }
 
     public void run() {

@@ -8,6 +8,7 @@
 package com.xmu.cs.lgp.redis.cluster.handler;
 
 import java.util.Date;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
@@ -23,10 +24,10 @@ import com.xmu.cs.lgp.redis.cluster.tools.RedisClusterProxy;
 public class ServerMessageHandler extends IoHandlerAdapter {
     private Logger logger = LoggerFactory.getLogger(ServerMessageHandler.class);
     private static int count = 1;
-    private RedisClusterProxy rcp;
+    private RedisClusterProxy redisClusterProxy;
     
     public ServerMessageHandler(RedisClusterProxy redisClusterProxy) {
-        this.rcp = redisClusterProxy;
+        this.redisClusterProxy = redisClusterProxy;
     }
     @Override
     public void exceptionCaught(IoSession session, Throwable cause)
@@ -43,11 +44,11 @@ public class ServerMessageHandler extends IoHandlerAdapter {
         MessageParser messageParser = new MessageParser();
         CommandExecutor ce = messageParser.parseMessage(str);
         if(ce != null){
-            jsonobj = rcp.execute(ce);
+            jsonobj = redisClusterProxy.execute(ce);
         }else{
             jsonobj = new JSONObject();
             Date date = new Date();
-            jsonobj.put("OK", date.toString() + " " + str);
+            jsonobj.put("OK", str + " " + date.toString());
         }
         session.write(jsonobj);
         logger.info("Message written...");
