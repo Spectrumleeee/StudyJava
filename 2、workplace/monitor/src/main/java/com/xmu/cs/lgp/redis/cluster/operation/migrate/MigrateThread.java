@@ -22,7 +22,6 @@ package com.xmu.cs.lgp.redis.cluster.operation.migrate;
 import javax.swing.JButton;
 
 import com.xmu.cs.lgp.redis.cluster.executor.MigrateExecutor;
-import com.xmu.cs.lgp.redis.cluster.monitor.MonitorClient;
 import com.xmu.cs.lgp.redis.cluster.tools.JedisTools;
 import com.xmu.cs.lgp.redis.cluster.tools.RedisClusterProxy;
 
@@ -59,8 +58,6 @@ public class MigrateThread extends Thread {
         target = migrateExecutor.getParams().get("param-2");
         slot_nums = Integer.parseInt(migrateExecutor.getParams().get(
                 "param-3"));
-
-        // migrateExecutor.getJtl().migrateSlots(source, target, slot_nums);
     }
 
     public void run() {
@@ -74,10 +71,11 @@ public class MigrateThread extends Thread {
             }
         }
         else{
-            System.out.println(source + " " + target + " " + slot_nums);
             try {
-                Thread.sleep(4000);
-            } catch (InterruptedException e) {
+//                System.out.println(source + " " + target + " " + slot_nums);
+//                Thread.sleep(4000);
+                 jtl.migrateSlots(source, target, slot_nums);
+            } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 proxy.setDone(true);

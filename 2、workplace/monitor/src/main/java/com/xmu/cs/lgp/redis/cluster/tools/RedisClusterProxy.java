@@ -19,8 +19,6 @@
  */
 package com.xmu.cs.lgp.redis.cluster.tools;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.json.JSONObject;
 
 import com.xmu.cs.lgp.redis.cluster.executor.CommandExecutor;
