@@ -37,38 +37,43 @@ public class RedisClusterProxy {
     private JedisTools jtl;
     private static RefreshThread rt;
     private static Object lock = new Object();
-    private final ConcurrentLinkedQueue<CommandExecutor> blockQueue;
-    private final JSONObject ANOTHER_RUNNING;
+    // private final ConcurrentLinkedQueue<CommandExecutor> blockQueue;
+    private final JSONObject RUNNING;
+    private final JSONObject RUN;
+    private boolean done;
 
     public RedisClusterProxy() {
-        blockQueue = new ConcurrentLinkedQueue<CommandExecutor>();
-        ANOTHER_RUNNING = new JSONObject().put("ErrMsg",
-                "Another Migrate Operation is Running!");
+        done = true;
+        // blockQueue = new ConcurrentLinkedQueue<CommandExecutor>();
+        RUNNING = new JSONObject().put("Msg", "Running!");
+        RUN = new JSONObject().put("Msg", "Starts to Run!");
         jtl = new JedisTools(lock);
         rt = new RefreshThread(jtl, lock);
         rt.start();
     }
-    
-    public JedisTools getJedisTools(){
+
+    public JedisTools getJedisTools() {
         return jtl;
     }
 
     public JSONObject execute(CommandExecutor ce) {
         if (ce instanceof MigrateExecutor) {
-            synchronized (blockQueue) {
-                if (blockQueue.isEmpty()) {
-                    blockQueue.add(ce);
-                } else
-                    return ANOTHER_RUNNING;
-            }
-            try {
-                return blockQueue.peek().execute(this);
-            } finally {
-                blockQueue.poll();
+            synchronized (RedisClusterProxy.class) {
+                if (!done) {
+                    return RUNNING;
+                } else {
+                    done = false;
+                    ce.execute(this);
+                    return RUN;
+                }
             }
         }
 
         return ce.execute(this);
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
     }
 
     public static void main(String[] args) {

@@ -21,39 +21,67 @@ package com.xmu.cs.lgp.redis.cluster.operation.migrate;
 
 import javax.swing.JButton;
 
+import com.xmu.cs.lgp.redis.cluster.executor.MigrateExecutor;
 import com.xmu.cs.lgp.redis.cluster.monitor.MonitorClient;
 import com.xmu.cs.lgp.redis.cluster.tools.JedisTools;
+import com.xmu.cs.lgp.redis.cluster.tools.RedisClusterProxy;
 
 /**
  * MigrateThread.java
- *
- * Copyright (c) 2014, TP-Link Co.,Ltd.
- * Author: liguangpu <liguangpu@tp-link.net>
- * Created: Dec 29, 2014
+ * 
+ * Copyright (c) 2014, TP-Link Co.,Ltd. Author: liguangpu
+ * <liguangpu@tp-link.net> Created: Dec 29, 2014
  */
 public class MigrateThread extends Thread {
-    private JedisTools jd;
+    private JedisTools jtl;
     private Object lock;
     private JButton jb;
     private MigrateStructure migrateStructure;
-    
-    public MigrateThread(JedisTools jd, Object lock, JButton jb, MigrateStructure migrateStructure) {
-        this.jd = jd;
+    private RedisClusterProxy proxy;
+    private String source;
+    private String target;
+    private int slot_nums;
+
+    public MigrateThread(JedisTools jtl, Object lock, JButton jb,
+            MigrateStructure migrateStructure) {
+        this.jtl = jtl;
         this.lock = lock;
         this.jb = jb;
         this.migrateStructure = migrateStructure;
     }
 
-    public MigrateThread(JButton okButton, MigrateStructure migrateStructure2,
-            MonitorClient monitorClient) {
-        
+    public MigrateThread(MigrateExecutor migrateExecutor,
+            RedisClusterProxy proxy) {
+        this.lock = null;
+        this.jtl = migrateExecutor.getJtl();
+        this.proxy = proxy;
+        source = migrateExecutor.getParams().get("param-1");
+        target = migrateExecutor.getParams().get("param-2");
+        slot_nums = Integer.parseInt(migrateExecutor.getParams().get(
+                "param-3"));
+
+        // migrateExecutor.getJtl().migrateSlots(source, target, slot_nums);
     }
 
     public void run() {
-        synchronized (lock) {
-            jd.migrateSlots(migrateStructure.getSource(), migrateStructure.getTarget(), migrateStructure.getMigrateSlotsNums());
-            jb.setEnabled(true);
-            migrateStructure.setFlag(true);
+        if (lock!=null) {
+            synchronized (lock) {
+                jtl.migrateSlots(migrateStructure.getSource(),
+                        migrateStructure.getTarget(),
+                        migrateStructure.getMigrateSlotsNums());
+                jb.setEnabled(true);
+                migrateStructure.setFlag(true);
+            }
+        }
+        else{
+            System.out.println(source + " " + target + " " + slot_nums);
+            try {
+                Thread.sleep(4000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                proxy.setDone(true);
+            }
         }
     }
 }

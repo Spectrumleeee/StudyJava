@@ -21,7 +21,6 @@ package com.xmu.cs.lgp.redis.cluster.executor;
 
 import org.json.JSONObject;
 
-import com.xmu.cs.lgp.redis.cluster.tools.JedisTools;
 import com.xmu.cs.lgp.redis.cluster.tools.RedisClusterProxy;
 
 /**

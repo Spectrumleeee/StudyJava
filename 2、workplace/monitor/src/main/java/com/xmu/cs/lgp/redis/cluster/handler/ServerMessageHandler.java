@@ -8,7 +8,6 @@
 package com.xmu.cs.lgp.redis.cluster.handler;
 
 import java.util.Date;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;

@@ -38,6 +38,10 @@ import com.xmu.cs.lgp.redis.cluster.monitor.MonitorClient;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import javax.swing.JLabel;
+
+import org.json.JSONObject;
+
 /**
  * MigrateViewDialog.java
  * 
@@ -139,6 +143,9 @@ public class MigrateViewDialog extends JDialog {
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
             getContentPane().add(buttonPane, BorderLayout.SOUTH);
             {
+                final JLabel label_status = new JLabel("");
+                buttonPane.add(label_status);
+
                 final JButton okButton = new JButton("START");
                 okButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -161,14 +168,22 @@ public class MigrateViewDialog extends JDialog {
                                 + migrateStructure.getSource() + "#"
                                 + migrateStructure.getTarget() + "#"
                                 + migrateStructure.getMigrateSlotsNums();
-                        String rst = monitorClient.sendMessage(command);
-//                        if(rst == null || rst.equals("FAIL")){
-//                            return;
-//                        }
+                        String rst;
+                        try{
+                            rst = monitorClient.sendMessage(command);
+                        }catch(Exception ee){
+                            label_status.setText("Server is Down");
+                            return;
+                        }
+                        label_status.setText(new JSONObject(rst).getString("Msg"));
                         okButton.setEnabled(true);
                         migrateStructure.setFlag(true);
                     }
                 });
+                {
+                    JLabel lblNewLabel = new JLabel("     ");
+                    buttonPane.add(lblNewLabel);
+                }
                 okButton.setActionCommand("OK");
                 buttonPane.add(okButton);
                 getRootPane().setDefaultButton(okButton);

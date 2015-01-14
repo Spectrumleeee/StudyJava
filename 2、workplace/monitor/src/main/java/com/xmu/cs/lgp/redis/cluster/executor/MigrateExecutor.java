@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
+import com.xmu.cs.lgp.redis.cluster.operation.migrate.MigrateThread;
 import com.xmu.cs.lgp.redis.cluster.tools.JedisTools;
 import com.xmu.cs.lgp.redis.cluster.tools.RedisClusterProxy;
 
@@ -44,18 +45,15 @@ public class MigrateExecutor implements CommandExecutor {
     }
     @Override
     public JSONObject execute(RedisClusterProxy proxy) {
-        jtl = new JedisTools(new Object());
+        setJtl(new JedisTools(new Object()));
         JSONObject jsonobj = new JSONObject();
         for(String key : params.keySet()){
             jsonobj.put(key, params.get(key));
         }
-        System.out.println(jsonobj.toString());
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return jsonobj;
+        Thread migrateThread = new MigrateThread(this, proxy);
+        migrateThread.start();
+        
+        return null;
     }
     
     public static void main(String[] args){
@@ -65,5 +63,17 @@ public class MigrateExecutor implements CommandExecutor {
         params.put("param-3", "24");
         MigrateExecutor me = new MigrateExecutor(params);
         me.execute(null);
+    }
+    
+    public JedisTools getJtl() {
+        return jtl;
+    }
+    
+    public void setJtl(JedisTools jtl) {
+        this.jtl = jtl;
+    }
+    
+    public Map<String, String> getParams(){
+        return this.params;
     }
 }

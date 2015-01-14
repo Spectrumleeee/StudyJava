@@ -45,15 +45,11 @@ import javax.swing.RowSorter;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.util.Set;
 
 import javax.swing.JMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
 
-import org.json.JSONObject;
-
-import com.xmu.cs.lgp.redis.cluster.operation.migrate.MigrateDialog;
 import com.xmu.cs.lgp.redis.cluster.operation.migrate.MigrateStructure;
 import com.xmu.cs.lgp.redis.cluster.operation.migrate.MigrateViewDialog;
 import com.xmu.cs.lgp.redis.cluster.process.parser.JsonParser;
