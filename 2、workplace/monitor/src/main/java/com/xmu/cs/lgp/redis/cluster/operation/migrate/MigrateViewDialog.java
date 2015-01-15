@@ -49,7 +49,10 @@ import org.json.JSONObject;
  * <liguangpu@tp-link.net> Created: Jan 13, 2015
  */
 public class MigrateViewDialog extends JDialog {
-
+    /*
+     * A dialog that show the migrate information
+     * This dialog was designed with WindowBuilder in MyEclipse2014
+     */
     private static final long serialVersionUID = 1L;
     private final JPanel contentPanel = new JPanel();
     private JTextField tf_source;
@@ -71,7 +74,7 @@ public class MigrateViewDialog extends JDialog {
     }
 
     /**
-     * Create the dialog. Edited with WindowBuilder and MyEclipse2014
+     * Create the dialog. 
      */
     public MigrateViewDialog(final MigrateStructure migrateStructure,
             final MonitorClient monitorClient, JButton btnMigrate) {
@@ -192,7 +195,7 @@ public class MigrateViewDialog extends JDialog {
     }
 
     /*
-     * @see javax.swing.JDialog#processWindowEvent(java.awt.event.WindowEvent)
+     * rewrite the window close event
      */
     protected void processWindowEvent(WindowEvent e) {
         if (e.getID() == WindowEvent.WINDOW_CLOSING) {

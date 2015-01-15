@@ -38,6 +38,7 @@ public class MemoryJsonParser extends JsonParser {
             return null;
         
         JSONObject obj = new JSONObject(str);
+        @SuppressWarnings("unchecked")
         Set<String> keys = obj.keySet();
         int rows = keys.size();
         rstObj = new Object[rows][6];

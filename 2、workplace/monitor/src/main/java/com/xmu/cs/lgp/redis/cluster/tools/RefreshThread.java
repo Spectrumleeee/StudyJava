@@ -48,7 +48,7 @@ public class RefreshThread extends Thread {
                 timer++;
                 Thread.sleep(REFRESH_TIME_INTERNEL);
                 synchronized (lock) {
-                    jd.js = jd.getJedis("Timer");
+                    jd.jedisArray = jd.getJedis("Timer");
                 }
                 if (timer == 60) {
                     timer = 0;

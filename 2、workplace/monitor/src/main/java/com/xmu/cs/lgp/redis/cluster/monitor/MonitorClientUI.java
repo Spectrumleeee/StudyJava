@@ -67,8 +67,9 @@ import com.xmu.cs.lgp.redis.cluster.tools.RefreshThread;
 public class MonitorClientUI extends JFrame {
 
     /*
-     * This UI program can show the redis cluster memory/slots info It connects
-     * to the MonitorServer , which is a RedisClusterProxy Server
+     * This UI program can show the redis cluster memory/slots info, It connects
+     * to the MonitorServer by using MonitorClient api , and the MonitorServer 
+     * is a RedisClusterProxy, it execute the client command by using Jedis api.
      */
 
     private static final long serialVersionUID = 1L;

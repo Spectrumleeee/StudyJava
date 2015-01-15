@@ -38,18 +38,20 @@ import redis.clients.jedis.exceptions.JedisException;
  * <liguangpu@tp-link.net> Created: Dec 15, 2014
  */
 public class JedisTools {
+
     private static final int NODE_NUMBER = 1024;
-    private Object[][] data;
-    private JedisCluster jc;
-    private Object lock;
-    public Jedis[] js = null;
-    public JedisPool[] jsp = null;
     private int[] flag = new int[NODE_NUMBER];
-    private Map<String, String> result;
+    private Object[][] data;
+    private Object lock;
+    private JedisCluster jedisCluster;
     private String[] nodeNames;
-    private Map<String, String> ipPort2nodeId;
+    private Map<String, String> result;
     private Map<String, Jedis> ipPort2Jedis;
+    private Map<String, String> ipPort2nodeId;
     private Map<String, ArrayList<Integer>> ipPort2nodeSlots;
+
+    public Jedis[] jedisArray = null;
+    public JedisPool[] jedisPool = null;
 
     public JedisTools(Object lock) {
         this.lock = lock;
@@ -58,17 +60,18 @@ public class JedisTools {
 
     public Object[][] getMemoryInfo() {
         synchronized (lock) {
-            if (js == null)
-                js = getJedis("MEMROY");
+            if (jedisArray == null)
+                jedisArray = getJedis("MEMROY");
 
             data = new Object[nodeNames.length][6];
             int index = 0;
-            for (; index < js.length; index++) {
+            for (; index < jedisArray.length; index++) {
                 if (flag[index] == 1) {
                     try {
-                        String info = js[index].info("memory");
+                        String info = jedisArray[index].info("memory");
                         Map<String, String> keyValues = parseInfo(info);
-                        String mx = js[index].configGet("maxmemory").get(1);
+                        String mx = jedisArray[index].configGet("maxmemory")
+                                .get(1);
                         keyValues.put("maxmemory", mx);
                         Integer mm_human = Integer.parseInt(mx) / (1024 * 1024);
                         keyValues.put("maxmemory_human", mm_human.toString()
@@ -106,13 +109,13 @@ public class JedisTools {
      */
     public Object[][] getSlotsInfo() {
         synchronized (lock) {
-            if (js == null)
-                js = getJedis("SLOT");
+            if (jedisArray == null)
+                jedisArray = getJedis("SLOT");
 
-            for (int index = 0; index < js.length; index++) {
+            for (int index = 0; index < jedisArray.length; index++) {
                 if (flag[index] == 1) {
                     try {
-                        String info = js[index].clusterNodes();
+                        String info = jedisArray[index].clusterNodes();
 
                         initNodeInfo(info);
 
@@ -138,8 +141,8 @@ public class JedisTools {
      */
     public Object[][] migrateSlots(String source, String target, int slot_nums) {
 
-        if (js == null)
-            js = getJedis("SLOT");
+        if (jedisArray == null)
+            jedisArray = getJedis("SLOT");
 
         // Initiate first
         for (String item : ipPort2Jedis.keySet()) {
@@ -153,7 +156,7 @@ public class JedisTools {
         }
 
         List<Integer> nodeSlots = ipPort2nodeSlots.get(source);
-        
+
         if (nodeSlots.size() < slot_nums) {
             System.err
                     .println("[INFO] source node does not have such many slots");
@@ -172,7 +175,7 @@ public class JedisTools {
                 break;
             }
         }
-        
+
         return data;
     }
 
@@ -200,9 +203,9 @@ public class JedisTools {
             String rst;
             for (String key : keys) {
                 String[] ipPort = target_ipport.split(":");
-                rst = source.migrate(ipPort[0], Integer.parseInt(ipPort[1]), key, db,
-                        timeout);
-                if(rst==null || !rst.equals("OK")){
+                rst = source.migrate(ipPort[0], Integer.parseInt(ipPort[1]),
+                        key, db, timeout);
+                if (rst == null || !rst.equals("OK")) {
                     System.out.println("migrate failed!");
                 }
             }
@@ -214,12 +217,12 @@ public class JedisTools {
      */
     public Jedis[] getJedis(String msg) {
         result = new HashMap<String, String>();
-        if (jc == null)
-            jc = JedisClusterFactory.getJedisCluster();
-        Map<String, JedisPool> clusterNodes = jc.getClusterNodes();
+        if (jedisCluster == null)
+            jedisCluster = JedisClusterFactory.getJedisCluster();
+        Map<String, JedisPool> clusterNodes = jedisCluster.getClusterNodes();
         int node_nums = clusterNodes.size();
-        js = new Jedis[node_nums];
-        jsp = new JedisPool[node_nums];
+        jedisArray = new Jedis[node_nums];
+        jedisPool = new JedisPool[node_nums];
         for (int i = 0; i < node_nums; i++)
             flag[i] = 1;
         int index = 0;
@@ -228,36 +231,36 @@ public class JedisTools {
         for (String key : clusterNodes.keySet()) {
             nodeNames[index] = key;
             try {
-                jsp[index] = clusterNodes.get(key);
+                jedisPool[index] = clusterNodes.get(key);
                 if (clusterNodesStatus == null) {
-                    js[index] = jsp[index].getResource();
-                    ipPort2Jedis.put(key, js[index]);
-                    clusterNodesStatus = getClusterNodes(js[index]
+                    jedisArray[index] = jedisPool[index].getResource();
+                    ipPort2Jedis.put(key, jedisArray[index]);
+                    clusterNodesStatus = getClusterNodes(jedisArray[index]
                             .clusterNodes());
                     if (clusterNodesStatus.size() != node_nums) {
-                        js[index].close();
-                        jc = JedisClusterFactory.getJedisCluster();
+                        jedisArray[index].close();
+                        jedisCluster = JedisClusterFactory.getJedisCluster();
                         return getJedis("Node Delete Or Add In Redis Cluster!");
                     }
                 } else if (clusterNodesStatus.get(key)) {
-                    js[index] = jsp[index].getResource();
-                    ipPort2Jedis.put(key, js[index]);
+                    jedisArray[index] = jedisPool[index].getResource();
+                    ipPort2Jedis.put(key, jedisArray[index]);
                 } else {
                     flag[index] = 0;
                 }
             } catch (JedisException e) {
                 flag[index] = 0;
-                jsp[index].returnBrokenResource(js[index]);
+                jedisPool[index].returnBrokenResource(jedisArray[index]);
             } finally {
                 try {
-                    jsp[index].returnResource(js[index]);
+                    jedisPool[index].returnResource(jedisArray[index]);
                 } catch (Exception e) {
                 }
             }
             index++;
         }
         clusterNodes.clear();
-        return js;
+        return jedisArray;
     }
 
     /*
@@ -289,8 +292,8 @@ public class JedisTools {
     }
 
     /*
-     * initiate the node information from the replay of `cluster nodes` 1、
-     * ip-port to arraylist of node slot' 2、 ip-port to node id;
+     * initiate the node information from the reply of `cluster nodes` 1、ip-port
+     * to arraylist of node slot'; 2、 ip-port to node id;
      */
     public void initNodeInfo(String info) {
         ipPort2nodeSlots = new HashMap<String, ArrayList<Integer>>();
@@ -325,5 +328,14 @@ public class JedisTools {
             }
             ipPort2nodeSlots.put(eachNodeStatus[1], slots);
         }
+    }
+    
+    public static void main(String[] args){
+        Map<String, String> ipPort2nodeId = new HashMap<String, String>();
+        ipPort2nodeId.put("abc", "123");
+        ipPort2nodeId.put("def", "456");
+        ipPort2nodeId.clear();
+        ipPort2nodeId.put("123", "abc");
+        ipPort2nodeId.put("456", "def");
     }
 }

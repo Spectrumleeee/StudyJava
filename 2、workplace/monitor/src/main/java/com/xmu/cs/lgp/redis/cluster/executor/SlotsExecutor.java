@@ -42,6 +42,6 @@ public class SlotsExecutor implements CommandExecutor {
     }
     
     public static void main(String[] args) {
-
+        // Test the method function
     }
 }
