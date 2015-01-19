@@ -81,8 +81,6 @@ public class MonitorClientUI extends JFrame {
     private JTable memoryTable;
     private JTable slotsTable;
     private CardLayout layout;
-    private String[] columnNames = { "Node", "Node-status", "Mem-used",
-            "Mem-used-peak", "MaxMemory", "Percent(used/max)" };
     private JedisTools jtl;
     private JButton btnMigrate;
     private Object lock = new Object();
@@ -93,6 +91,8 @@ public class MonitorClientUI extends JFrame {
     private MigrateViewDialog migrateDialog;
     private Object[][] data;
     private MonitorClient client;
+    private String[] columnNames = { "Node", "Node-status", "Mem-used",
+            "Mem-used-peak", "MaxMemory", "Percent(used/max)" };
 
     /**
      * Launch the application.

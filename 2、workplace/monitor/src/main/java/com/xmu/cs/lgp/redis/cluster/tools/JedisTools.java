@@ -45,10 +45,11 @@ public class JedisTools {
     private Object lock;
     private JedisCluster jedisCluster;
     private String[] nodeNames;
-    private Map<String, String> result;
-    private Map<String, Jedis> ipPort2Jedis;
-    private Map<String, String> ipPort2nodeId;
-    private Map<String, ArrayList<Integer>> ipPort2nodeSlots;
+    private Map<String, String> memoryInfo = null;
+    private Map<String, Jedis> ipPort2Jedis = null;
+    private Map<String, String> ipPort2nodeId = null;
+    private Map<String, Boolean> clusterNodesStatus = null;
+    private Map<String, ArrayList<Integer>> ipPort2nodeSlots = null;
 
     public Jedis[] jedisArray = null;
     public JedisPool[] jedisPool = null;
@@ -59,6 +60,11 @@ public class JedisTools {
     }
 
     public Object[][] getMemoryInfo() {
+        
+        Map<String, String> keyValues = null;
+        String info,umh,ump,umph,mx;
+        int um,mm,mmh;
+        
         synchronized (lock) {
             if (jedisArray == null)
                 jedisArray = getJedis("MEMROY");
@@ -66,39 +72,33 @@ public class JedisTools {
             data = new Object[nodeNames.length][6];
             int index = 0;
             for (; index < jedisArray.length; index++) {
-                if (flag[index] == 1) {
-                    try {
-                        String info = jedisArray[index].info("memory");
-                        Map<String, String> keyValues = parseInfo(info);
-                        String mx = jedisArray[index].configGet("maxmemory")
-                                .get(1);
-                        keyValues.put("maxmemory", mx);
-                        Integer mm_human = Integer.parseInt(mx) / (1024 * 1024);
-                        keyValues.put("maxmemory_human", mm_human.toString()
-                                + "M");
-                        int um = Integer.parseInt(keyValues.get("used_memory"));
-                        int mm = Integer.parseInt(keyValues.get("maxmemory"));
-                        keyValues.put("percent",
-                                String.format("%f", (float) 100 * um / mm));
-                        data[index][0] = nodeNames[index];
-                        data[index][1] = "OK";
-                        data[index][2] = keyValues.get("used_memory") + " / "
-                                + keyValues.get("used_memory_human");
-                        data[index][3] = keyValues.get("used_memory_peak")
-                                + " / "
-                                + keyValues.get("used_memory_peak_human");
-                        data[index][4] = keyValues.get("maxmemory") + " / "
-                                + keyValues.get("maxmemory_human");
-                        data[index][5] = new Float(keyValues.get("percent"));
-                    } catch (Exception e) {
-                        data[index][1] = "FAIL";
-                        flag[index] = 2;
-                    }
-                } else {
+
+                if (flag[index] == 0) {
                     data[index][0] = nodeNames[index];
                     data[index][1] = "FAIL";
                 }
 
+                try {
+                    info = jedisArray[index].info("memory");
+                    keyValues = getMemoryFromInfo(info);
+                    mx = jedisArray[index].configGet("maxmemory").get(1);
+                    umh = keyValues.get("used_memory_human");
+                    ump = keyValues.get("used_memory_peak");
+                    umph = keyValues.get("used_memory_peak_human");
+                    um = Integer.parseInt(keyValues.get("used_memory"));
+                    mmh = Integer.parseInt(mx) / (1024 * 1024);
+                    mm = Integer.parseInt(mx);
+
+                    data[index][0] = nodeNames[index];
+                    data[index][1] = "OK";
+                    data[index][2] = um + " / " + umh;
+                    data[index][3] = ump + " / " + umph;
+                    data[index][4] = mx + " / " + mmh + "M";
+                    data[index][5] = new Float((float) 100 * um / mm);
+                } catch (Exception e) {
+                    data[index][1] = "FAIL";
+                    flag[index] = 0;
+                }
             }
         }
         return data;
@@ -139,12 +139,11 @@ public class JedisTools {
     /*
      * Migrate Slots From source to target
      */
-    public Object[][] migrateSlots(String source, String target, int slot_nums) {
+    public boolean migrateSlots(String source, String target, int slot_nums) {
 
         if (jedisArray == null)
-            jedisArray = getJedis("SLOT");
+            jedisArray = getJedis("MIGRATE SLOT");
 
-        // Initiate first
         for (String item : ipPort2Jedis.keySet()) {
             try {
                 String info = ipPort2Jedis.get(item).clusterNodes();
@@ -160,8 +159,9 @@ public class JedisTools {
         if (nodeSlots.size() < slot_nums) {
             System.err
                     .println("[INFO] source node does not have such many slots");
+            return false;
         }
-        // Move slot one by one
+
         for (int i = 1; i <= slot_nums; i++) {
             try {
                 moveSlot(source, target, nodeSlots.get(0), 0, 15000);
@@ -176,23 +176,32 @@ public class JedisTools {
             }
         }
 
-        return data;
+        return true;
     }
 
     public void moveSlot(String source_ipport, String target_ipport, int slot,
             int db, int timeout) {
+
+        List<String> keys = null;
+        String[] ipPort = null;
+        String nodeId, rt = null;
+
         Jedis source = ipPort2Jedis.get(source_ipport);
         Jedis target = ipPort2Jedis.get(target_ipport);
 
-        if (!source.clusterSetSlotMigrating(slot,
-                ipPort2nodeId.get(source_ipport)).equals("OK"))
+        nodeId = ipPort2nodeId.get(source_ipport);
+        if (!source.clusterSetSlotMigrating(slot, nodeId).equals("OK")) {
             System.err.println("command clusterSetSlotMigrating error!");
-        if (!target.clusterSetSlotImporting(slot,
-                ipPort2nodeId.get(target_ipport)).equals("OK"))
+            return;
+        }
+        nodeId = ipPort2nodeId.get(target_ipport);
+        if (!target.clusterSetSlotImporting(slot, nodeId).equals("OK")) {
             System.err.println("command clusterSetSlotImporting error!");
-        // Migrate all the keys of slot one by one
+            return;
+        }
+
         while (true) {
-            List<String> keys = source.clusterGetKeysInSlot(slot, 123);
+            keys = source.clusterGetKeysInSlot(slot, 123);
             if (keys.size() == 0) {
                 for (String item : ipPort2Jedis.keySet()) {
                     ipPort2Jedis.get(item).clusterSetSlotNode(slot,
@@ -200,13 +209,14 @@ public class JedisTools {
                 }
                 break;
             }
-            String rst;
+
             for (String key : keys) {
-                String[] ipPort = target_ipport.split(":");
-                rst = source.migrate(ipPort[0], Integer.parseInt(ipPort[1]),
+                ipPort = target_ipport.split(":");
+                rt = source.migrate(ipPort[0], Integer.parseInt(ipPort[1]),
                         key, db, timeout);
-                if (rst == null || !rst.equals("OK")) {
-                    System.out.println("migrate failed!");
+                if (rt == null || !rt.equals("OK")) {
+                    System.err.println("migrate failed!");
+                    return;
                 }
             }
         }
@@ -216,7 +226,7 @@ public class JedisTools {
      * get the Jedis connection to each cluster node
      */
     public Jedis[] getJedis(String msg) {
-        result = new HashMap<String, String>();
+
         if (jedisCluster == null)
             jedisCluster = JedisClusterFactory.getJedisCluster();
         Map<String, JedisPool> clusterNodes = jedisCluster.getClusterNodes();
@@ -235,7 +245,7 @@ public class JedisTools {
                 if (clusterNodesStatus == null) {
                     jedisArray[index] = jedisPool[index].getResource();
                     ipPort2Jedis.put(key, jedisArray[index]);
-                    clusterNodesStatus = getClusterNodes(jedisArray[index]
+                    clusterNodesStatus = getClusterNodesStatus(jedisArray[index]
                             .clusterNodes());
                     if (clusterNodesStatus.size() != node_nums) {
                         jedisArray[index].close();
@@ -263,32 +273,39 @@ public class JedisTools {
         return jedisArray;
     }
 
-    /*
-     * parse the `cluster info[memory]`
-     */
-    public Map<String, String> parseInfo(Object from) {
-        String[] eachlines = ((String) from).split("\r\n");
+    public Map<String, String> getMemoryFromInfo(Object from) {
+
+        String[] eachItems = ((String) from).split("\r\n");
         String[] keyValue = null;
-        for (int i = 1; i < eachlines.length; i++) {
-            keyValue = eachlines[i].split(":");
-            result.put(keyValue[0], keyValue[1]);
+
+        if (memoryInfo == null)
+            memoryInfo = new HashMap<String, String>();
+        else
+            memoryInfo.clear();
+
+        for (int i = 1; i < eachItems.length; i++) {
+            keyValue = eachItems[i].split(":");
+            memoryInfo.put(keyValue[0], keyValue[1]);
         }
-        return result;
+        return memoryInfo;
     }
 
-    /*
-     * get the status[OK/FAIL/PFAIL] of each cluster nodes
-     */
-    public Map<String, Boolean> getClusterNodes(String info) {
-        Map<String, Boolean> rst = new HashMap<String, Boolean>();
-        String[] clusterNodesStatus = info.split("\n");
-        for (String item : clusterNodesStatus) {
+    public Map<String, Boolean> getClusterNodesStatus(String info) {
+
+        String[] clusterNodesInfo = info.split("\n");
+
+        if (clusterNodesStatus == null)
+            clusterNodesStatus = new HashMap<String, Boolean>();
+        else
+            clusterNodesStatus.clear();
+
+        for (String item : clusterNodesInfo) {
             if (item.contains("fail"))
-                rst.put(item.split(" ")[1], false);
+                clusterNodesStatus.put(item.split(" ")[1], false);
             else
-                rst.put(item.split(" ")[1], true);
+                clusterNodesStatus.put(item.split(" ")[1], true);
         }
-        return rst;
+        return clusterNodesStatus;
     }
 
     /*
@@ -296,41 +313,45 @@ public class JedisTools {
      * to arraylist of node slot'; 2、 ip-port to node id;
      */
     public void initNodeInfo(String info) {
+
+        String[] clusterNodesInfo = null;
+        String[] eachNodeInfo = null;
+
         ipPort2nodeSlots = new HashMap<String, ArrayList<Integer>>();
         ipPort2nodeId = new HashMap<String, String>();
-        String[] clusterNodesStatus = info.split("\n");
-        for (String item : clusterNodesStatus) {
-            String[] eachNodeStatus = item.split(" ");
-            ipPort2nodeId.put(eachNodeStatus[1], eachNodeStatus[0]);
+        clusterNodesInfo = info.split("\n");
+
+        for (String item : clusterNodesInfo) {
+            eachNodeInfo = item.split(" ");
+            ipPort2nodeId.put(eachNodeInfo[1], eachNodeInfo[0]);
 
             if (!item.contains("master") || item.contains("fail"))
                 continue;
-            if (eachNodeStatus.length <= 8) {
-                ipPort2nodeSlots.put(eachNodeStatus[1],
-                        new ArrayList<Integer>());
+            if (eachNodeInfo.length <= 8) {
+                ipPort2nodeSlots.put(eachNodeInfo[1], new ArrayList<Integer>());
                 continue;
             }
 
             ArrayList<Integer> slots = new ArrayList<Integer>();
             int start, end;
-            for (int index = 8; index < eachNodeStatus.length; index++) {
-                if (!eachNodeStatus[index].contains("-"))
-                    slots.add(Integer.parseInt(eachNodeStatus[index]));
+            for (int index = 8; index < eachNodeInfo.length; index++) {
+                if (!eachNodeInfo[index].contains("-"))
+                    slots.add(Integer.parseInt(eachNodeInfo[index]));
                 else {
-                    start = Integer
-                            .parseInt(eachNodeStatus[index].split("-")[0]);
-                    end = Integer.parseInt(eachNodeStatus[index].split("-")[1]);
+                    start = Integer.parseInt(eachNodeInfo[index].split("-")[0]);
+                    end = Integer.parseInt(eachNodeInfo[index].split("-")[1]);
                     while (start <= end) {
                         slots.add(start);
                         start++;
                     }
                 }
             }
-            ipPort2nodeSlots.put(eachNodeStatus[1], slots);
+            ipPort2nodeSlots.put(eachNodeInfo[1], slots);
         }
     }
-    
-    public static void main(String[] args){
+
+    public static void main(String[] args) {
+        System.err.println("123123123");
         Map<String, String> ipPort2nodeId = new HashMap<String, String>();
         ipPort2nodeId.put("abc", "123");
         ipPort2nodeId.put("def", "456");
