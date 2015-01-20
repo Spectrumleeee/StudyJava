@@ -48,6 +48,7 @@ public class JedisTools {
     private Map<String, String> memoryInfo = null;
     private Map<String, Jedis> ipPort2Jedis = null;
     private Map<String, String> ipPort2nodeId = null;
+    private Map<String, JedisPool> clusterNodes = null;
     private Map<String, Boolean> clusterNodesStatus = null;
     private Map<String, ArrayList<Integer>> ipPort2nodeSlots = null;
 
@@ -221,23 +222,37 @@ public class JedisTools {
             }
         }
     }
-
+    
+    public int InitJedisPool(){
+        int node_nums = 0;
+        
+        if (jedisCluster == null)
+            jedisCluster = JedisClusterFactory.getJedisCluster();
+        
+        clusterNodes = jedisCluster.getClusterNodes();
+        node_nums = clusterNodes.size();
+        nodeNames = new String[node_nums];
+        
+        if(jedisArray == null || jedisArray.length != node_nums)
+            jedisArray = new Jedis[node_nums];
+        
+        if(jedisPool == null || jedisPool.length != node_nums)
+            jedisPool = new JedisPool[node_nums];
+        
+        for (int i = 0; i < node_nums; i++)
+            flag[i] = 1;
+        
+        return node_nums;
+    }
     /*
      * get the Jedis connection to each cluster node
      */
     public Jedis[] getJedis(String msg) {
-
-        if (jedisCluster == null)
-            jedisCluster = JedisClusterFactory.getJedisCluster();
-        Map<String, JedisPool> clusterNodes = jedisCluster.getClusterNodes();
-        int node_nums = clusterNodes.size();
-        jedisArray = new Jedis[node_nums];
-        jedisPool = new JedisPool[node_nums];
-        for (int i = 0; i < node_nums; i++)
-            flag[i] = 1;
-        int index = 0;
-        nodeNames = new String[node_nums];
         Map<String, Boolean> clusterNodesStatus = null;
+        int index, node_nums = 0;
+        
+        node_nums = InitJedisPool();
+        index = 0;
         for (String key : clusterNodes.keySet()) {
             nodeNames[index] = key;
             try {
@@ -260,7 +275,6 @@ public class JedisTools {
                 }
             } catch (JedisException e) {
                 flag[index] = 0;
-                jedisPool[index].returnBrokenResource(jedisArray[index]);
             } finally {
                 try {
                     jedisPool[index].returnResource(jedisArray[index]);
@@ -349,7 +363,7 @@ public class JedisTools {
             ipPort2nodeSlots.put(eachNodeInfo[1], slots);
         }
     }
-
+    
     public static void main(String[] args) {
         System.err.println("123123123");
         Map<String, String> ipPort2nodeId = new HashMap<String, String>();
