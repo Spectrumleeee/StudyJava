@@ -61,14 +61,13 @@ public class JedisTools {
     }
 
     public Object[][] getMemoryInfo() {
-        
+
         Map<String, String> keyValues = null;
-        String info,umh,ump,umph,mx;
-        int um,mm,mmh;
-        
+        String info, umh, ump, umph, mx;
+        int um, mm, mmh;
+
         synchronized (lock) {
-            if (jedisArray == null)
-                jedisArray = getJedis("MEMROY");
+            jedisArray = getJedis("MEMROY");
 
             data = new Object[nodeNames.length][6];
             int index = 0;
@@ -110,8 +109,7 @@ public class JedisTools {
      */
     public Object[][] getSlotsInfo() {
         synchronized (lock) {
-            if (jedisArray == null)
-                jedisArray = getJedis("SLOT");
+            jedisArray = getJedis("SLOT");
 
             for (int index = 0; index < jedisArray.length; index++) {
                 if (flag[index] == 1) {
@@ -142,8 +140,7 @@ public class JedisTools {
      */
     public boolean migrateSlots(String source, String target, int slot_nums) {
 
-        if (jedisArray == null)
-            jedisArray = getJedis("MIGRATE SLOT");
+        jedisArray = getJedis("MIGRATE SLOT");
 
         for (String item : ipPort2Jedis.keySet()) {
             try {
@@ -223,34 +220,47 @@ public class JedisTools {
         }
     }
     
-    public int InitJedisPool(){
+    private void closeJedis(){
+        if (jedisArray == null)
+            return;
+        for (Jedis jedis : jedisArray) {
+            if (jedis.isConnected())
+                jedis.close();
+        }
+    }
+    
+    public int InitJedisPool() {
         int node_nums = 0;
         
-        if (jedisCluster == null)
-            jedisCluster = JedisClusterFactory.getJedisCluster();
-        
+        closeJedis();
+
+        if (jedisCluster != null)
+            jedisCluster.close();
+        jedisCluster = JedisClusterFactory.getJedisCluster();
+
         clusterNodes = jedisCluster.getClusterNodes();
         node_nums = clusterNodes.size();
         nodeNames = new String[node_nums];
-        
-        if(jedisArray == null || jedisArray.length != node_nums)
+
+        if (jedisArray == null || jedisArray.length != node_nums)
             jedisArray = new Jedis[node_nums];
-        
-        if(jedisPool == null || jedisPool.length != node_nums)
+
+        if (jedisPool == null || jedisPool.length != node_nums)
             jedisPool = new JedisPool[node_nums];
-        
+
         for (int i = 0; i < node_nums; i++)
             flag[i] = 1;
-        
+
         return node_nums;
     }
+
     /*
      * get the Jedis connection to each cluster node
      */
     public Jedis[] getJedis(String msg) {
         Map<String, Boolean> clusterNodesStatus = null;
         int index, node_nums = 0;
-        
+
         node_nums = InitJedisPool();
         index = 0;
         for (String key : clusterNodes.keySet()) {
@@ -277,7 +287,7 @@ public class JedisTools {
                 flag[index] = 0;
             } finally {
                 try {
-                    jedisPool[index].returnResource(jedisArray[index]);
+//                    jedisPool[index].returnResource(jedisArray[index]);
                 } catch (Exception e) {
                 }
             }
@@ -363,7 +373,7 @@ public class JedisTools {
             ipPort2nodeSlots.put(eachNodeInfo[1], slots);
         }
     }
-    
+
     public static void main(String[] args) {
         System.err.println("123123123");
         Map<String, String> ipPort2nodeId = new HashMap<String, String>();

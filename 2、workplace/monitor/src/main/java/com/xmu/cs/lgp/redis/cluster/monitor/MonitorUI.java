@@ -53,7 +53,7 @@ import javax.swing.JComboBox;
 import com.xmu.cs.lgp.redis.cluster.operation.migrate.MigrateDialog;
 import com.xmu.cs.lgp.redis.cluster.operation.migrate.MigrateStructure;
 import com.xmu.cs.lgp.redis.cluster.tools.JedisTools;
-import com.xmu.cs.lgp.redis.cluster.tools.RefreshThread;
+//import com.xmu.cs.lgp.redis.cluster.tools.RefreshThread;
 
 /**
  * Monitor.java
@@ -233,7 +233,7 @@ public class MonitorUI extends JFrame {
      */
     public void initMemoryTable() {
         jd = new JedisTools(lock);
-        new RefreshThread(jd, lock).start();
+//        new RefreshThread(jd, lock).start();
 
         Object[][] data = {
                 { "Kathy", "OK", "Smith", "Snowboarding", new Integer(5),
@@ -290,9 +290,6 @@ public class MonitorUI extends JFrame {
         slotsTable.setAutoCreateRowSorter(true);
     }
 
-    /*
-     * Update the slot info table
-     */
     public void updateSlotTable(boolean initSourceTarget) {
         String[] columnNames = { "Node", "Slot" };
         data = jd.getSlotsInfo();
@@ -302,9 +299,6 @@ public class MonitorUI extends JFrame {
             initSoruceTargetCombox(data);
     }
 
-    /*
-     * Update the memory info table
-     */
     public void updateMemoryTable() {
         DefaultTableModel tableModel = new DefaultTableModel(
                 jd.getMemoryInfo(), columnNames);
@@ -315,9 +309,6 @@ public class MonitorUI extends JFrame {
         memoryTable.setModel(tableModel);
     }
 
-    /*
-     * initiate the Combox that contain the source and target master node
-     */
     public void initSoruceTargetCombox(Object[][] obj) {
         int nodeNums = obj.length;
         cbxSource.removeAllItems();
@@ -328,9 +319,6 @@ public class MonitorUI extends JFrame {
         }
     }
 
-    /*
-     * check the source and target node to guarentee that they are not the same
-     */
     public boolean checkSourceTarget() {
         if (cbxSource.getSelectedIndex() == cbxTarget.getSelectedIndex()) {
             System.err.println("[INFO] can't migrate slots to the same node!!");

@@ -2,3 +2,4 @@
 target/*
 logs/*
 resources/jedis.properties
+/target

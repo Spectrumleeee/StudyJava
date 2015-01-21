@@ -55,8 +55,6 @@ import com.xmu.cs.lgp.redis.cluster.operation.migrate.MigrateViewDialog;
 import com.xmu.cs.lgp.redis.cluster.process.parser.JsonParser;
 import com.xmu.cs.lgp.redis.cluster.process.parser.MemoryJsonParser;
 import com.xmu.cs.lgp.redis.cluster.process.parser.SlotsJsonParser;
-import com.xmu.cs.lgp.redis.cluster.tools.JedisTools;
-import com.xmu.cs.lgp.redis.cluster.tools.RefreshThread;
 
 /**
  * Monitor.java
@@ -81,9 +79,7 @@ public class MonitorClientUI extends JFrame {
     private JTable memoryTable;
     private JTable slotsTable;
     private CardLayout layout;
-    private JedisTools jtl;
     private JButton btnMigrate;
-    private Object lock = new Object();
     private JLabel lblSourceNode;
     private JComboBox<String> cbxSource;
     private JLabel lblTargetNode;
@@ -240,9 +236,6 @@ public class MonitorClientUI extends JFrame {
      * Initiate the memory table
      */
     public void initMemoryTable() {
-        jtl = new JedisTools(lock);
-        new RefreshThread(jtl, lock).start();
-
         Object[][] data = {
                 { "Kathy", "OK", "Smith", "Snowboarding", new Integer(5),
                         new Float(0.0f) },

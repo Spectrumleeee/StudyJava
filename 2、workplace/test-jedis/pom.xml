@@ -4,7 +4,7 @@
 
     <groupId>com.xmu.cs.lgp</groupId>
     <artifactId>test-jedis</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3</version>
     <packaging>jar</packaging>
 
     <name>test-jedis</name>
@@ -25,9 +25,7 @@
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>2.6.1</version>
-            <type>jar</type>
-            <scope>compile</scope>
+            <version>2.6.2</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
