@@ -54,7 +54,7 @@ public class JedisClient {
         // jc.close();
         // }
         // for (int i = 0; i < 50; i++) {
-        // Jedis jd = new Jedis("172.29.88.117", 7000);
+        // Jedis jd = new Jedis("remote-ip", 7000);
         // System.out.println(jd.info("memory"));
         // System.out.println(jd.configGet("maxmemory"));
         // jd.close();
@@ -73,13 +73,13 @@ public class JedisClient {
         // + params[1].trim() + " : "
         // + params[3].trim().replace("]", ""));
         // }
-        // jedis.migrate("172.29.88.117", 7004, key, 0, 1000);
+        // jedis.migrate("remote-ip", 7004, key, 0, 1000);
 
         // while (true) {}
 
         // return 122 records once time.
-        Jedis source = new Jedis("172.29.88.117", 7003);
-        Jedis target = new Jedis("172.29.88.117", 7009);
+        Jedis source = new Jedis("remote-ip", 7003);
+        Jedis target = new Jedis("remote-ip", 7009);
 
         source.clusterSetSlotMigrating(1138,
                 "b8e319ebc706e1f0c38ded40370b0be891a63bf4");
@@ -90,7 +90,7 @@ public class JedisClient {
             List<String> keys = source.clusterGetKeysInSlot(1138, 123);
             for (String key : keys) {
                 System.out.println(key);
-                source.migrate("172.29.88.117", 7009, key, 0, 15000);
+                source.migrate("remote-ip", 7009, key, 0, 15000);
             }
             if(keys.size() == 0){
                 source.clusterSetSlotNode(1138, "faf3c82ebd36f6e04327d2ae9a0864b661259106");

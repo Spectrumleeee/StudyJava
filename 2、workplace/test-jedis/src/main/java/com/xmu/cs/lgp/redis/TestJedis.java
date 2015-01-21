@@ -41,8 +41,8 @@ public class TestJedis extends MyJedis {
     public static void main(String[] args) {
 
         Set<HostAndPort> jedisClusterNodes = new HashSet<HostAndPort>();
-        jedisClusterNodes.add(new HostAndPort("172.29.88.117", 7000));
-        jedisClusterNodes.add(new HostAndPort("172.29.88.117", 7001));
+        jedisClusterNodes.add(new HostAndPort("remote-ip", 7000));
+        jedisClusterNodes.add(new HostAndPort("remote-ip", 7001));
 //        TestJedis jc = new TestJedis(jedisClusterNodes);
 //        SetGetShell(jc);
         
