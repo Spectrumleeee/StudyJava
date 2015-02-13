@@ -1,0 +1,6 @@
+*.class
+/target/*
+/logs/*
+/src/main/resources/*
+/resources/*
+/target
