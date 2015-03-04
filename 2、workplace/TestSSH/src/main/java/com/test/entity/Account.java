@@ -8,6 +8,8 @@ import java.sql.Timestamp;
  */
 public class Account extends AbstractAccount implements java.io.Serializable {
 
+    private static final long serialVersionUID = -1862124937735074138L;
+
     // Constructors
 
     /** default constructor */

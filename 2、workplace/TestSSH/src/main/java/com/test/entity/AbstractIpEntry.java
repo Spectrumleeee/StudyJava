@@ -11,7 +11,8 @@ public abstract class AbstractIpEntry  implements java.io.Serializable {
 
     // Fields    
 
-     private Long id;
+    private static final long serialVersionUID = -6466040144513028755L;
+    private Long id;
      private String ipBegin;
      private String ipEnd;
      private Long locationId;

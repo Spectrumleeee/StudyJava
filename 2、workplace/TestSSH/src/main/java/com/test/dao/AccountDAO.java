@@ -21,7 +21,7 @@ package com.test.dao;
 
 import java.util.List;
 
-import org.hibernate.SQLQuery;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -35,42 +35,88 @@ import com.test.entity.Account;
  */
 public class AccountDAO {
 
-	private SessionFactory sessionFactory;
+    private SessionFactory sessionFactory;
 
-	public void findNameById() {
-		Session session = sessionFactory.openSession();
-		String sql = "select * from account";
-		try {
-			SQLQuery q = session.createSQLQuery(sql).addEntity(Account.class);
-			List<?> rs = q.list();
-			for (Object at : rs) {
-				System.out.println(((Account) at).getEmail());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (session != null)
-				session.close();
-		}
-	}
+    public void queryAll() {
+        Session session = sessionFactory.openSession();
+        try {
+            session.beginTransaction();
+            // List<?> rs =
+            // session.createSQLQuery("select * from account").addEntity(Account.class).list();
+            List<?> rs = session.createQuery("from Account").list();
+            for (Object at : rs) {
+                Account account = (Account) at;
+                System.out.println(account.getEmail() + " -- "
+                        + account.getMobile() + " -- " + account.getPassword());
+            }
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+        } finally {
+            // 通过openSession()打开的session与上下文无关，不受事务控制，需要手动关闭
+            if (session != null)
+                session.close();
+        }
+    }
 
-	public void save(Account account) {
-		Session session = sessionFactory.openSession();
-		try {
-			session.beginTransaction();
-			session.save(account);
-			session.getTransaction().commit();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			// session如果不关闭，能否重用？
-			if (session != null)
-				session.close();
-		}
-	}
+    public void save(Account account) {
+        Session session = sessionFactory.openSession();
+        try {
+            session.beginTransaction();
+            session.save(account);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+        } finally {
+            // 通过openSession()打开的session与上下文无关，不受事务控制，需要手动关闭
+            if (session != null)
+                session.close();
+        }
+    }
 
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
-
+    public void delete(String username) {
+        Session session = sessionFactory.openSession();
+        try {
+            session.beginTransaction();
+            String hql = "delete Account as at where at.email = ?";
+            Query deleteQuery = session.createQuery(hql);
+            deleteQuery.setParameter(0, username+"@tp-link.net");
+            deleteQuery.executeUpdate();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+        } finally {
+            // 通过openSession()打开的session与上下文无关，不受事务控制，需要手动关闭
+            if (session != null)
+                session.close();
+        }
+    }
+    
+    public void update(String username, String columnName, String columnValue) {
+        Session session = sessionFactory.openSession();
+        try {
+            session.beginTransaction();
+            String hql = "update Account at set at." + columnName
+                    + " = ? where at.email = ? ";
+            Query updateQuery = session.createQuery(hql);
+            updateQuery.setParameter(0, columnValue);
+            updateQuery.setParameter(1, username + "@tp-link.net");
+            updateQuery.executeUpdate();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+        } finally {
+            // 通过openSession()打开的session与上下文无关，不受事务控制，需要手动关闭
+            if (session != null)
+                session.close();
+        }
+    }
+    
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 }

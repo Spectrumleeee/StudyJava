@@ -8,10 +8,8 @@ package com.test.entity;
 
 public abstract class AbstractLocation  implements java.io.Serializable {
 
-
-    // Fields    
-
-     private Long id;
+    private static final long serialVersionUID = 6080614766262148156L;
+    private Long id;
      private String countryId;
      private String country;
      private Integer provinceId;

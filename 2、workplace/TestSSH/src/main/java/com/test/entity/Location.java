@@ -9,6 +9,8 @@ public class Location extends AbstractLocation implements java.io.Serializable {
 
     // Constructors
 
+    private static final long serialVersionUID = -5088385762800378433L;
+
     /** default constructor */
     public Location() {
     }

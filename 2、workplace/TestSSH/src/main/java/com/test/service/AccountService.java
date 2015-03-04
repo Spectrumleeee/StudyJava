@@ -17,6 +17,10 @@ import com.test.entity.Account;
 public class AccountService {
 	private AccountDAO accountDao;
 	
+	public void queryAll(){
+		accountDao.queryAll();
+	}
+	
 	public void saveAccount(String username){
 		Account account = new Account();
 		account.setEmail(username + "@tp-link.net");
@@ -27,6 +31,18 @@ public class AccountService {
 		account.setVersion(0L);
 		
 		accountDao.save(account);
+	}
+	
+	public void deleteAccount(String username){
+	    accountDao.delete(username);
+	}
+	
+	public void updateMobile(String username, String mobile){
+	    accountDao.update(username, "mobile", mobile);
+	}
+	
+	public void updatePassword(String username, String password){
+	    accountDao.update(username, "password", password);
 	}
 	
 	public void setAccountDao(AccountDAO accountDao){

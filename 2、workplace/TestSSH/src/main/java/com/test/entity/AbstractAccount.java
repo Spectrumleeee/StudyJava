@@ -9,10 +9,10 @@ import java.sql.Timestamp;
 
 public abstract class AbstractAccount  implements java.io.Serializable {
 
-
     // Fields    
-    
-     private Integer accountId;
+
+    private static final long serialVersionUID = 4128450639815508545L;
+    private Integer accountId;
      private String email;
      private String mobile;
      private String password;

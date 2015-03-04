@@ -9,6 +9,9 @@ public class IpEntry extends AbstractIpEntry implements java.io.Serializable {
 
     // Constructors
 
+    private static final long serialVersionUID = -853770956836465446L;
+
+
     /** default constructor */
     public IpEntry() {
     }
