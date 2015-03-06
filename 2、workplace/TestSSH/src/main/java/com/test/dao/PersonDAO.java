@@ -29,7 +29,7 @@ public class PersonDAO {
             session.close();
         }
     }
-
+    
     public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }

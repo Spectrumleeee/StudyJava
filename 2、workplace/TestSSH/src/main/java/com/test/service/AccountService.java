@@ -21,6 +21,10 @@ public class AccountService {
 		accountDao.queryAll();
 	}
 	
+	public void queryByIdPessimisticLock(int id){
+	    accountDao.queryById(id);
+	}
+	
 	public void saveAccount(String username){
 		Account account = new Account();
 		account.setEmail(username + "@tp-link.net");
@@ -39,6 +43,11 @@ public class AccountService {
 	
 	public void updateMobile(String username, String mobile){
 	    accountDao.update(username, "mobile", mobile);
+	}
+	
+	public void updateMobileById(int id, String mobile){
+//	    accountDao.updateById(id, mobile);
+	    accountDao.updateByIdLock(id, mobile);
 	}
 	
 	public void updatePassword(String username, String password){

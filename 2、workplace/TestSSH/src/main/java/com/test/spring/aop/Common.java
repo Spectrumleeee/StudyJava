@@ -11,4 +11,8 @@ public class Common {
     public void execute(String username, String password){
         System.out.println("------------------普通类----------------");
     }
+    
+    public void sayHello(String username){
+        System.out.println("------------------hello"+username+"----------------");
+    }
 }

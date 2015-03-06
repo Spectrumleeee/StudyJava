@@ -8,7 +8,7 @@
 	<aop:config>
 		<aop:aspect id="myAop" ref="check">
 			<aop:pointcut id="target"
-				expression="execution(* com.test.spring.aop.Common.execute(..))" />
+				expression="execution(* com.test.spring.aop.Common.*(..))" />
 			<aop:before method="checkValidity" pointcut-ref="target" />
 			<aop:after method="addLog" pointcut-ref="target" />
 		</aop:aspect>

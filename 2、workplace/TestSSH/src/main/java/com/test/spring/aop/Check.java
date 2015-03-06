@@ -19,8 +19,9 @@ public class Check {
     public void addLog(JoinPoint j){
         System.out.println("-------------------添加日志----------------"); 
         Object obj[] = j.getArgs();
+        int i=0;
         for(Object o : obj)
-            System.out.println("[INFO] " + o);
+            System.out.println("[INFO] args"+(i++)+":" + o);
         System.out.println("[INFO] ========checkSecurity======== "+j.getSignature().getName());
     }
     

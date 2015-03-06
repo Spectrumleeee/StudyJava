@@ -35,6 +35,7 @@
 				<prop key="hibernate.autoReconnection">${hibernate.autoReconnection}</prop>
 				<prop key="hibernate.jdbc.batch_size">${hibernate.jdbc.batch_size}</prop>
 				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.connection.isolation">${hibernate.connection.isolation}</prop>
 			</props>
 		</property>
 		<property name="mappingResources">
@@ -55,12 +56,13 @@
 	<bean id="amSessionFactory" parent="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 
+		<!-- 1、逐个添加注解实体类 -->
 		<property name="annotatedClasses">
 			<list>
 				<value>com.test.entity.Cat</value>
 			</list>
 		</property>
-		<!-- or below configuration -->
+		<!-- 2、扫描所有主题实体所在包 -->
 		<property name="packagesToScan">
 			<list>
 				<value>com.test.entity</value>

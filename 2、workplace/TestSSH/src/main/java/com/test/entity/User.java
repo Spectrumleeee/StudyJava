@@ -42,6 +42,7 @@ public class User {
      * {@JoinColumn(name = "inter_group_id", referencedColumnName ="group_id")}
      * )
      */
+    // 设置User表的外键，即Group表的主键
     @JoinColumn(name = "group_id")
     public Group getGroup() {
         return group;

@@ -19,7 +19,8 @@ public class AopApp {
     public static void main(String[] args){
         System.out.println("++++--------------SpringAOP测试--------------++++");
         Common c = (Common)ctx.getBean("common");
-        c.execute("args0:liguangpu", "args1:liguangpu");
+        c.execute("liguangpu", "spectrumleeee");
+        c.sayHello("lgp");
         System.out.println("++++-------------- AOP测试完成 --------------++++");
     }
 }

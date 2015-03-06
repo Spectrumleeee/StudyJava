@@ -21,9 +21,10 @@ package com.test.dao;
 
 import java.util.List;
 
+import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import com.test.entity.Account;
 
@@ -33,12 +34,10 @@ import com.test.entity.Account;
  * Copyright (c) 2014, TP-Link Co.,Ltd. Author: liguangpu
  * <liguangpu@tp-link.net> Created: Feb 11, 2015
  */
-public class AccountDAO {
-
-    private SessionFactory sessionFactory;
+public class AccountDAO extends HibernateDaoSupport{
 
     public void queryAll() {
-        Session session = sessionFactory.openSession();
+        Session session = this.getSessionFactory().openSession();
         try {
             session.beginTransaction();
             // List<?> rs =
@@ -61,7 +60,7 @@ public class AccountDAO {
     }
 
     public void save(Account account) {
-        Session session = sessionFactory.openSession();
+        Session session = this.getSessionFactory().openSession();
         try {
             session.beginTransaction();
             session.save(account);
@@ -77,7 +76,7 @@ public class AccountDAO {
     }
 
     public void delete(String username) {
-        Session session = sessionFactory.openSession();
+        Session session = this.getSessionFactory().openSession();
         try {
             session.beginTransaction();
             String hql = "delete Account as at where at.email = ?";
@@ -96,7 +95,7 @@ public class AccountDAO {
     }
     
     public void update(String username, String columnName, String columnValue) {
-        Session session = sessionFactory.openSession();
+        Session session = this.getSessionFactory().openSession();
         try {
             session.beginTransaction();
             String hql = "update Account at set at." + columnName
@@ -116,7 +115,58 @@ public class AccountDAO {
         }
     }
     
-    public void setSessionFactory(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+    // 根据Id修改对象
+    public void updateById(int id, String mobile){
+        Session session = this.getSession();
+        try {
+            session.beginTransaction();
+            Account at = (Account) session.load(Account.class, id);
+            at.setMobile(mobile);
+            session.update(at);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+        } finally {
+            // 通过openSession()打开的session与上下文无关，不受事务控制，需要手动关闭
+            releaseSession(session);
+        }
+    }
+    
+    // 根据Id修改对象,加悲观锁，应该死锁，但是测试结果，表没有被锁住，？？？ 数据库引擎不支持？隔离级别不对？
+    public void updateByIdLock(int id, String mobile){
+        Session session = this.getSession();
+        try {
+            session.beginTransaction();
+            Account at = (Account) session.load(Account.class, id, LockOptions.UPGRADE);
+            at.setMobile(mobile);
+            session.update(at);
+            
+            updateById(id, mobile+"_A");
+            
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+        } finally {
+            // 通过openSession()打开的session与上下文无关，不受事务控制，需要手动关闭
+            releaseSession(session);
+        }
+    }
+    
+    // 根据Id查询对象，同时加上悲观锁 LockMode.UPGRADE
+    public void queryById(int id){
+        Session session = this.getSession();
+        try{
+            session.beginTransaction();
+            Account account = (Account) session.load(Account.class, id, LockOptions.UPGRADE);
+            System.out.println("Pessimistic Query Account: "+account.getEmail()+" "+account.getMobile());
+            session.getTransaction().commit();
+        }catch(Exception e){
+            e.printStackTrace();
+            session.getTransaction().rollback();
+        }finally{
+            releaseSession(session);
+        }
     }
 }

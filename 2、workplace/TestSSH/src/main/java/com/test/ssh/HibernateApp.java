@@ -39,8 +39,8 @@ public class HibernateApp {
 
 	public static void main(String[] args) {
 //	    test_mobileInfo();
-//	    test_account();
-	    test_user_group();
+	    test_account();
+//	    test_user_group();
 	}
 
 	public static void test_flight(){
@@ -73,19 +73,24 @@ public class HibernateApp {
 //		as.saveAccount("liguangpu");
 //		as.saveAccount("liyunpeng");
 //		as.saveAccount("chenbiren");
-		as.saveAccount("zhangsanfeng");
+//		as.saveAccount("zhangsanfeng");
 //	    as.updateMobile("liguangpu", "13725638497");
 //	    as.updateMobile("liyunpeng", "15765854958");
 //	    as.updateMobile("chenbiren", "18856359785");
 //	    as.updatePassword("zhangsanfeng", "55555");
-	    as.updateMobile("zhangsanfeng", "18333458569");
+//	    as.updateMobile("zhangsanfeng", "14734358569");
+		as.updateMobileById(2, "13333458569");
+//	    as.queryByIdPessimisticLock(2);
 //	    as.deleteAccount("zhangsanfeng");
 	}
 	
 	public static void test_mobileInfo(){
 	    CommonService cs = (CommonService) ctx.getBean("commonService");
-	    cs.insertMobileInfo("18333458569");
-	    cs.deleteMobileInfo("18333458569");
+//	    cs.insertMobileInfo("18333458569");
+//	    cs.insertMobileInfo("13833458569");
+//	    cs.deleteMobileInfo("18333458569");
+//	    cs.testOptimisticLockA(1l,"USA");
+	    cs.testOptimisticLockB(1l,"USA2");
 	}
 	
 	public static void test_user_group(){
@@ -94,7 +99,7 @@ public class HibernateApp {
 	    cs.insertGroup("class_2");
 	    cs.queryGroupUser("class_2");
 //	    cs.queryUserGroupUsers("class_1 Wang Wu");
-//	    cs.deleteGroup("class_1");
+	    cs.deleteGroup("class_1");
 //	    cs.insertUser("Zhang San");
 //	    cs.insertUser("Li Si");
 //	    cs.insertUser("Wang Wu");

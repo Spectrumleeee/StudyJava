@@ -78,6 +78,14 @@ public class CommonService {
 	    commonDao.deleteGroupCascade(groupName);
 	}
 	
+	public void testOptimisticLockA(long id, String country){
+	    commonDao.testOptimisticLockA(id, country);
+	}
+	
+    public void testOptimisticLockB(long id, String country) {
+        commonDao.testOptimisticLockB(id, country);
+    }
+    
 	public void queryGroupUser(String groupName){
 	    commonDao.queryGroupUsers(groupName);
 	}

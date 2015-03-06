@@ -215,4 +215,45 @@ public class CommonDAO extends HibernateDaoSupport {
         }
         return user;
     }
+
+    // 测试乐观锁，同一个应用，两个事务中同时修改数据
+    public void testOptimisticLockA(long id, String country) {
+        Session s1 = this.getSessionFactory().openSession();
+        Session s2 = this.getSessionFactory().openSession();
+
+        s1.beginTransaction();
+        MobileInfo mi1 = (MobileInfo) s1.load(MobileInfo.class, id);
+        mi1.setCountry(country + "_A");
+        s1.update(mi1);
+        System.out.println(mi1.getVersion());
+
+        s2.beginTransaction();
+        MobileInfo mi2 = (MobileInfo) s2.load(MobileInfo.class, id);
+        mi2.setCountry(country + "_B");
+        s2.update(mi2);
+        System.out.println(mi2.getVersion());
+
+        s1.getTransaction().commit();
+        s2.getTransaction().commit();
+        s1.close();
+        s2.close();
+    }
+
+    // 测试乐观锁，需要两个main同时运行，一个中断
+    public void testOptimisticLockB(long id, String country) {
+        Session session = this.getSessionFactory().openSession();
+        try {
+            session.beginTransaction();
+            MobileInfo mi1 = (MobileInfo) session.load(MobileInfo.class, id);
+            mi1.setCountry(country);
+            session.update(mi1);
+            System.out.println(mi1.getVersion());
+            // 此处设置断点，debug运行至此处，然后运行另外一个程序修改该条记录
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        } finally {
+            session.close();
+        }
+    }
 }

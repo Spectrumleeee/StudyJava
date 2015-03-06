@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 /**
  * MobileInfo.java
@@ -22,11 +23,16 @@ public class MobileInfo {
     private String mobile;
     private String country;
     private String province;
+    private int version;
     
     public MobileInfo(String mobile){
         this.mobile = mobile;
         this.country = "CN";
         this.province = "JiangXi";
+    }
+    
+    public MobileInfo(){
+        
     }
     @Id
     @GeneratedValue
@@ -62,5 +68,14 @@ public class MobileInfo {
 
     public void setProvince(String province) {
         this.province = province;
+    }
+
+    @Version
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 }
