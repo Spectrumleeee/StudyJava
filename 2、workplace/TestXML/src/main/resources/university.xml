@@ -14,9 +14,9 @@
 	</college>
 	<college name="art">
 	    <class name="class3">  
-            <student name="stu7" sex='male' age="20" />  
+            <student name="stu7" sex='male' age="20" />
         </class>
 	</college>
-	<college name="c3">  
+	<college name="mathematics">  
     </college>
 </university>

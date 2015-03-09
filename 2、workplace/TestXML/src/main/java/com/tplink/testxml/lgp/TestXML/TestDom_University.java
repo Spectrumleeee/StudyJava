@@ -30,36 +30,36 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
-public class TestDom {
+/*
+ * 基于 DOM 操作XML文件
+ */
+public class TestDom_University {
+    // 创建DocumentBuilderFactory解析工厂
+    static DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
-    /**
-     * @param args
-     */
     public static void main(String[] args) {
-        // TODO Auto-generated method stub
         read();
         write();
     }
 
+    /*
+     * 使用 DOM 解析XML文件
+     */
     public static void read() {
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
+            // 由DocumentBuilderFactory实例一个DocumentBuilder
             DocumentBuilder builder = dbf.newDocumentBuilder();
-            /**
-             * if use *.class.getClassLoader().getResouceAsStream, test.xml must put in
-             * the directory 'src/main/java'; if use *.class.getResourceAsStream, the 
-             * text.xml must put in the same drectory with this java file. 
-             */
-            InputStream in = TestDom.class.getClassLoader()
-                    .getResourceAsStream("test.xml");
+            // 读取要解析的XML文件到输入流
+            InputStream in = TestDom_University.class.getClassLoader()
+                    .getResourceAsStream("university.xml");
+            // 用DocumentBuilder通过输入流构建Document实例（对应XML文件）
             Document doc = builder.parse(in);
-            // root <university>
+            // 获取Document实例的第一个Element,即root元素
             Element root = doc.getDocumentElement();
             if (root == null)
                 return;
             System.err.println(root.getAttribute("name"));
-            // all college node
+            // 获取Element元素的所有college子节点Node
             NodeList collegeNodes = root.getChildNodes();
             if (collegeNodes == null)
                 return;
@@ -70,7 +70,7 @@ public class TestDom {
                     System.err.println("\t"
                             + college.getAttributes().getNamedItem("name")
                                     .getNodeValue());
-                    // all class node
+                    // 获取college节点的class子节点
                     NodeList classNodes = college.getChildNodes();
                     if (classNodes == null)
                         continue;
@@ -82,7 +82,7 @@ public class TestDom {
                                     + clazz.getAttributes()
                                             .getNamedItem("name")
                                             .getNodeValue());
-                            // all student node
+                            // 获取class节点的student子节点
                             NodeList studentNodes = clazz.getChildNodes();
                             if (studentNodes == null)
                                 continue;
@@ -117,21 +117,20 @@ public class TestDom {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
+    /*
+     * 使用 DOM 修改重写一个 XML文件
+     */
     public static void write() {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder builder = dbf.newDocumentBuilder();
-            InputStream in = TestDom.class.getClassLoader()
-                    .getResourceAsStream("test.xml");
+            InputStream in = TestDom_University.class.getClassLoader()
+                    .getResourceAsStream("university.xml");
             Document doc = builder.parse(in);
-            // root <university>
             Element root = doc.getDocumentElement();
             if (root == null)
                 return;
-            // modify an attribute
             root.setAttribute("name", "nku");
             NodeList collegeNodes = root.getChildNodes();
             if (collegeNodes != null) {
@@ -146,30 +145,34 @@ public class TestDom {
                             root.removeChild(college);
                         } else if ("c3".equals(collegeName)) {
                             Element newChild = doc.createElement("class");
-                            newChild.setAttribute("name", "c4");
+                            newChild.setAttribute("name", "class4");
                             college.appendChild(newChild);
                         }
                     }
                 }
             }
-            // create a node 
+            // 创建一个新节点，要使用Element
             Element addCollege = doc.createElement("college");
-            addCollege.setAttribute("name", "c5");
+            addCollege.setAttribute("name", "finance");
             root.appendChild(addCollege);
             Text text = doc.createTextNode("text");
             addCollege.appendChild(text);
 
-            // save the modified file
+            // 由转化工厂生成转化者
             TransformerFactory transFactory = TransformerFactory.newInstance();
             Transformer transFormer = transFactory.newTransformer();
+            // 将Document作为DOMSource作为转化源
             DOMSource domSource = new DOMSource(doc);
-            File file = new File("dom-modify.xml");
+            // 创建一个文件，保存结果
+            File file = new File("university-dom.xml");
             if (file.exists()) {
                 file.delete();
             }
             file.createNewFile();
             FileOutputStream out = new FileOutputStream(file);
+            // 转化目的地址为StreamResult
             StreamResult xmlResult = new StreamResult(out);
+            // 最终转化者将DOMSource转化为StreamResult
             transFormer.transform(domSource, xmlResult);
             System.out.println(file.getAbsolutePath());
         } catch (ParserConfigurationException e) {

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><university name="nku">
+	<college name="cs">
+		<class name="class1">
+			<student age="21" name="stu1" sex="male"/>
+			<student age="20" name="stu2" sex="female"/>
+			<student age="20" name="stu3" sex="female"/>
+		</class>
+		<class name="class2">
+		    <student age="19" name="stu4" sex="male"/>
+            <student age="20" name="stu5" sex="female"/>
+            <student age="21" name="stu6" sex="female"/>
+		</class>
+	</college>
+	<college name="art">
+	    <class name="class3">  
+            <student age="20" name="stu7" sex="male"/>
+        </class>
+	</college>
+	<college name="mathematics">  
+    </college>
+<college name="finance">text</college></university>
