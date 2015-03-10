@@ -1,4 +1,4 @@
-package com.tplink.testxml.lgp.TestXML;
+package com.xmu.lgp.TestXML;
 
 import java.util.Iterator;
 import java.util.List;
@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.xmu.lgp.TestXML.TestDom4j;
 
 /**
  * T_DOM4j.java

@@ -1,4 +1,4 @@
-package com.tplink.testxml.lgp.entity;
+package com.xmu.lgp.entity;
 
 import java.util.List;
 

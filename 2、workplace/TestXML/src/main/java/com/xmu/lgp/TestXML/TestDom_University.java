@@ -5,7 +5,7 @@
  * Updated: Aug 19, 2014
  */
 
-package com.tplink.testxml.lgp.TestXML;
+package com.xmu.lgp.TestXML;
 
 import java.io.File;
 import java.io.FileNotFoundException;

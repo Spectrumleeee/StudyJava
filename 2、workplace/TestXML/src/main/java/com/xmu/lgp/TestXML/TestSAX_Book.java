@@ -1,4 +1,4 @@
-package com.tplink.testxml.lgp.TestXML;
+package com.xmu.lgp.TestXML;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.tplink.testxml.lgp.entity.Book;
+import com.xmu.lgp.entity.Book;
 
 /**
  * TestSAX.java

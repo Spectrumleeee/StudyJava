@@ -1,4 +1,4 @@
-package com.tplink.testxml.lgp.TestXML;
+package com.xmu.lgp.TestXML;
 
 import java.io.InputStream;
 import java.util.ArrayList;

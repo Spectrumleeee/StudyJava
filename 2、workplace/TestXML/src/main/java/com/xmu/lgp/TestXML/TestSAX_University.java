@@ -1,4 +1,4 @@
-package com.tplink.testxml.lgp.TestXML;
+package com.xmu.lgp.TestXML;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -11,9 +11,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.tplink.testxml.lgp.entity.Classes;
-import com.tplink.testxml.lgp.entity.College;
-import com.tplink.testxml.lgp.entity.Student;
+import com.xmu.lgp.entity.Classes;
+import com.xmu.lgp.entity.College;
+import com.xmu.lgp.entity.Student;
 
 /**
  * 演示SAX用法， 这里讲XML文件解析保存到内存中，实际上SAX的优势是处理大文件，类似流媒体方式，读取即处理

@@ -1,4 +1,4 @@
-package com.tplink.testxml.lgp.TestXML;
+package com.xmu.lgp.TestXML;
 
 import java.io.InputStream;
 import java.util.List;
@@ -6,10 +6,12 @@ import java.util.List;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.tplink.testxml.lgp.entity.Book;
-import com.tplink.testxml.lgp.entity.Classes;
-import com.tplink.testxml.lgp.entity.College;
-import com.tplink.testxml.lgp.entity.Student;
+import com.xmu.lgp.TestXML.TestSAX_Book;
+import com.xmu.lgp.TestXML.TestSAX_University;
+import com.xmu.lgp.entity.Book;
+import com.xmu.lgp.entity.Classes;
+import com.xmu.lgp.entity.College;
+import com.xmu.lgp.entity.Student;
 
 /**
  * T_SAX.java
