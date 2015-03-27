@@ -37,11 +37,13 @@ public class TestMongoDriver {
     public static void main(String[] args) throws Exception {
         TestMongoDriver tmd = new TestMongoDriver();
         // tmd.testCRUD();
-        tmd.test_replSet();
+        // tmd.test_replSet();
+        tmd.test_sharding();
     }
 
     public TestMongoDriver() throws UnknownHostException {
-        mongo = new MongoClient("192.168.255.130", 27017);
+        mongo = new MongoClient(bundle.getString("mongodb.ip"),
+                Integer.parseInt(bundle.getString("single.port")));
     }
 
     public void testCRUD() {
@@ -138,7 +140,7 @@ public class TestMongoDriver {
         String replSetIp = null;
 
         List<ServerAddress> addresses = new ArrayList<ServerAddress>();
-        replSetIp = bundle.getString("replSet.ip");
+        replSetIp = bundle.getString("mongodb.ip");
 
         for (int i = 1; i <= 3; i++) {
             addr = new ServerAddress(replSetIp, Integer.parseInt(bundle
@@ -146,6 +148,16 @@ public class TestMongoDriver {
             addresses.add(addr);
         }
         mongo = new MongoClient(addresses);
+    }
+
+    public void test_sharding() throws Exception {
+        mongo = new MongoClient(bundle.getString("mongodb.ip"),
+                Integer.parseInt(bundle.getString("sharding.mongos.port1")));
+        db = mongo.getDB("test");
+        DBCollection coll = db.getCollection("person");
+        
+        for (int i = 0; i < 100; i++)
+            coll.insert(new BasicDBObject().append("name", "sharding-" + i));
     }
 
     // 将一般Object转换为 Mongo DBObject
