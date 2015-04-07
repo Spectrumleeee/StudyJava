@@ -36,9 +36,9 @@ public class TestMongoDriver {
 
     public static void main(String[] args) throws Exception {
         TestMongoDriver tmd = new TestMongoDriver();
-        // tmd.testCRUD();
+         tmd.testCRUD();
         // tmd.test_replSet();
-        tmd.test_sharding();
+//        tmd.test_sharding();
     }
 
     public TestMongoDriver() throws UnknownHostException {
