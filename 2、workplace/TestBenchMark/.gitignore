@@ -2,3 +2,6 @@
 /target/*
 /logs/*
 /src/main/resources/*
+/.settings/*
+/.classpath
+/.project
