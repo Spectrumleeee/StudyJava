@@ -8,6 +8,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -147,7 +148,7 @@ public class Junit4Test {
         this.println("   @Test test2() finished");
     }
 
-    @Test
+    @Ignore
     public void test3() {
         this.println("   @Test test3() begin");
         String hi = "   @Test test3() execute during evaluate()";

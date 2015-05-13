@@ -1,6 +1,7 @@
 package com.xmu.lgp.junit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -53,12 +54,12 @@ public class CommonTest {
         assertEquals("误差在精度范围内",1.00, 1.01, 0.1);
     }
 
-    @Test
+    @Test(expected=AssertionError.class)
     public void t3_1(){
         assertEquals("误差不可以大于精度啦",1.00, 1.01, 0.001);
     }
     
-    @Test
+    @Test(expected=AssertionError.class)
     public void t3_2(){
         assertEquals("误差等于精度也不可以",1.00, 1.01, 0.01);
     }

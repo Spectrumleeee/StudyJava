@@ -18,17 +18,15 @@ import com.netflix.curator.retry.ExponentialBackoffRetry;
  * <liguangpu@tp-link.net> Created: 2015-3-27
  */
 public class TestCurator {
-
     static CuratorFramework zkclient = null;
     static String nameSpace = "mongodb/mongos";
     static {
-        String zkhost = "172.29.88.117:2181";// zk的host
+        String zkhost = "172.29.88.117:2181";
         RetryPolicy rp = new ExponentialBackoffRetry(1000, 3);// 重试机制
         Builder builder = CuratorFrameworkFactory.builder()
                 .connectString(zkhost).connectionTimeoutMs(5000)
                 .sessionTimeoutMs(5000).retryPolicy(rp);
-        builder.namespace(nameSpace);
-        zkclient = builder.build();
+        zkclient = builder.namespace(nameSpace).build();
         zkclient.start();// 放在这前面执行
         zkclient.newNamespaceAwareEnsurePath(nameSpace);
     }
@@ -36,29 +34,14 @@ public class TestCurator {
     public static void main(String[] args) throws Exception {
         TestCurator ct = new TestCurator();
 
-        // ct.upload("/jianli/123.txt", "D:\\123.txt");
-//        ct.createrOrUpdate("/zk/cc334/zzz", "c");
-        ct.getListChildren("");
-        ct.checkExist("/bef");
-//        ct.delete("/zk/cc334/zzz");
-        int i=0;
-        while (true) {
-            ct.read("/proxy1");
-            ct.createrOrUpdate("/proxy1", ""+i++);
-            Thread.sleep(2000);
-        }
-
-        // zkclient.close();
+        ct.upload("/proxy3/zk", "zk.txt");
+//        ct.getListChildren("");
+//        ct.checkExist("/proxy1");
+//        ct.getListChildren("/proxy1");
+//        ct.delete("/proxy1", true);
+//        zkclient.close();
     }
 
-    /**
-     * 创建或更新一个节点
-     * 
-     * @param path
-     *            路径
-     * @param content
-     *            内容
-     * **/
     public void createrOrUpdate(String path, String content) throws Exception {
         zkclient.newNamespaceAwareEnsurePath(path).ensure(
                 zkclient.getZookeeperClient());
@@ -66,24 +49,18 @@ public class TestCurator {
         System.out.println("添加成功！！！");
     }
 
-    /**
-     * 删除zk节点
-     * 
-     * @param path
-     *            删除节点的路径
-     * 
-     * **/
-    public void delete(String path) throws Exception {
-        // zkclient.delete().guaranteed().deletingChildrenIfNeeded().forPath(path);
-        zkclient.delete().guaranteed().forPath(path);
-        System.out.println("删除成功!");
+    public void delete(String path, boolean recursive) throws Exception {
+        if (!recursive)
+            zkclient.delete().guaranteed().forPath(path);
+        else {
+            List<String> paths = zkclient.getChildren().forPath(path);
+            for (String item : paths) {
+                delete(path + "/" + item, recursive);
+            }
+            zkclient.delete().guaranteed().forPath(path);
+        }
     }
 
-    /**
-     * 判断路径是否存在
-     * 
-     * @param path
-     * **/
     public void checkExist(String path) throws Exception {
         if (zkclient.checkExists().forPath(path) == null) {
             System.out.println("路径不存在!");
@@ -92,39 +69,24 @@ public class TestCurator {
         }
     }
 
-    /**
-     * 读取的路径
-     * 
-     * @param path
-     * **/
     public void read(String path) throws Exception {
         String data = new String(zkclient.getData().forPath(path), "gbk");
         System.out.println("读取的数据:" + data);
     }
 
-    /**
-     * @param path
-     *            路径 获取某个节点下的所有子文件
-     * */
     public void getListChildren(String path) throws Exception {
         List<String> paths = zkclient.getChildren().forPath(path);
         for (String p : paths) {
             System.out.println(p);
         }
+        if (paths.size() == 0)
+            System.out.println(path + " is empty!");
     }
 
-    /**
-     * @param zkPath
-     *            zk上的路径
-     * @param localpath
-     *            本地上的文件路径
-     * 
-     * **/
     public void upload(String zkPath, String localpath) throws Exception {
-        createrOrUpdate(zkPath, "");// 创建路径
+        createrOrUpdate(zkPath, "");
         byte[] bs = FileUtils.readFileToByteArray(new File(localpath));
         zkclient.setData().forPath(zkPath, bs);
         System.out.println("上传文件成功！");
     }
-
 }
