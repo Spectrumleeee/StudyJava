@@ -54,4 +54,12 @@ public class MongoDao{
         MongoDao dao = new MongoDao("test", "collector");
         dao.persist(Long.parseLong(args[1]), Integer.parseInt(args[0]));
     }
+
+    /**
+     * @return
+     */
+    public DBCollection getCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
