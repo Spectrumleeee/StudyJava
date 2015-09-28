@@ -8,7 +8,7 @@
 		<version>1.0.0</version>
 	</parent>
 	<artifactId>TestBenchMark</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>
 	<url>http://maven.apache.org</url>
@@ -66,24 +66,6 @@
 					</archive>
 					<outputDirectory>${project.build.directory}/lib</outputDirectory>
 				</configuration>
-			</plugin>
-			<!-- 拷贝依赖的jar包到lib目录 -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.5</version>
-				<executions>
-					<execution>
-						<id>copy</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 			<!-- 拷贝资源文件src\main\resources, bin到target\conf, bin目录下 -->
 			<plugin>
@@ -190,17 +172,17 @@
 		<dependency>
 			<groupId>com.tplink</groupId>
 			<artifactId>cloud-common</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.13</version>
 		</dependency>
 		<dependency>
 			<groupId>com.tplink</groupId>
 			<artifactId>cloud-api</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
-			<version>2.11.2</version>
+			<version>3.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>redis.clients</groupId>

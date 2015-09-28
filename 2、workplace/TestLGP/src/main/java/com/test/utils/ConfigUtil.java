@@ -11,19 +11,21 @@ import java.util.List;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
-public class ConfigUtils {
-    
-    private static final String CONFIG_FILE_NAME = "sys.properties";
-    
+public class ConfigUtil {
+    private static String configFileName = "sys.properties";
     private static Configuration config;
     
     static {
         try {
-            config = new PropertiesConfiguration(CONFIG_FILE_NAME);
+            config = new PropertiesConfiguration(configFileName);
         } catch (Exception e) {
             throw new RuntimeException("Configuration loading error: "
-                    + "configFileName: " + CONFIG_FILE_NAME, e);
+                    + "configFileName: " + configFileName, e);
         }
+    }
+    
+    public static void setConfigFileName(String fileName){
+        configFileName = fileName;
     }
     
     public static String getString(String key) {

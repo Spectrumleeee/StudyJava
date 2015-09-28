@@ -6,45 +6,47 @@
 
 package com.tplink.test.mongodb;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
-import com.mongodb.WriteConcern;
-import com.tplink.test.utils.ConfigUtils;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.UpdateOptions;
+import com.tplink.test.dao.MongoDao;
+import com.tplink.test.utils.ConfigUtil;
 
 public class TestMongoDB {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(TestMongoDB.class);
-
-    private MongoClient mongo = null;
-    private DBCollection dbColl = null;
-    private DB db = null;
+    private UpdateOptions UPDATE_WITH_UPSERT = new UpdateOptions().upsert(true);
+    private MongoDao mongoDao;
+    private MongoCollection<Document> collection;
     private AtomicLong count = new AtomicLong(0);
     private long startCon = 0;
     private boolean isWrite = true;
+    private boolean upsert = false;
 
     public TestMongoDB() {
         try {
-            mongo = new MongoClient(ConfigUtils.getString("mongodb.ip"),
-                    ConfigUtils.getInt("mongodb.port"));
-
-            db = mongo.getDB(ConfigUtils.getString("mongodb.database"));
-            dbColl = db.getCollection(ConfigUtils.getString("mongodb.coll"));
-            dbColl.setWriteConcern(new WriteConcern(ConfigUtils
-                    .getInt("mongodb.mode")));
+            mongoDao = new MongoDao(ConfigUtil.getString("mongodb.url.1"));
+            collection = mongoDao.getCollection();
+            upsert = ConfigUtil.getBoolean("mongodb.upsert");
+            if (upsert) {
+                System.out.println("useReplaceOne");
+            } else {
+                System.out.println("useInsertOne");
+            }
         } catch (Exception e) {
             LOGGER.error("Init mongoDB Connection error!");
         }
     }
 
     public void parseCommandLine(String[] args) {
-        switch(args[0]){
+        LOGGER.debug(Arrays.toString(args));
+        switch (args[0]) {
         case "--w":
             isWrite = true;
             switch (args.length) {
@@ -61,12 +63,13 @@ public class TestMongoDB {
             break;
         case "--r":
             isWrite = false;
-            switch (args.length){
+            switch (args.length) {
             case 3:
                 query(Long.parseLong(args[1]), Long.parseLong(args[2]));
                 break;
             case 4:
-                curQuery(Long.parseLong(args[1]), Long.parseLong(args[2]), Integer.parseInt(args[3]));
+                curQuery(Long.parseLong(args[1]), Long.parseLong(args[2]),
+                        Integer.parseInt(args[3]));
                 break;
             default:
                 break;
@@ -74,31 +77,67 @@ public class TestMongoDB {
         }
     }
 
+    public void insertDuplicateID() {
+        collection.insertOne(new Document("name", "a"));
+    }
+
     /**
-     * test the insert performance
+     * test the insert performance of single thread
      * 
      * @param num
+     *            total records
      * @param size
+     *            size of each record
      */
     public void persist(long num, long size) {
         StringBuilder str = new StringBuilder();
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             str.append((char) (Math.random() * 26 + 65));
-        BasicDBObject obj = new BasicDBObject().append(size + "B-" + num,
-                str.toString());
+        }
+        Document template = new Document("content", str.toString());
 
         long start = System.currentTimeMillis();
-        for (long i = 0; i < num; i++) {
-            dbColl.insert(((BasicDBObject) obj.clone()).append("i", i).append(
-                    "j", num - i - 1));
-        }
+        insert(num, template);
         long finish = System.currentTimeMillis();
         count.getAndIncrement();
 
         System.out.println(size + "B-" + num + " --> " + num * 1000
-                / (float)(finish - start));
+                / (float) (finish - start));
     }
 
+    private boolean insert(long num, Document tmp) {
+        return upsert ? useReplaceOne(num, tmp) : useInsertOne(num, tmp);
+    }
+
+    private boolean useInsertOne(long num, Document template) {
+        String threadName = getThreadName();
+        for (long i = 0; i < num; i++) {
+            Document toInsert = Document.parse(template.toJson())
+                    .append("_id", threadName + i).append("j", num - i);
+            collection.insertOne(toInsert);
+        }
+        return true;
+    }
+
+    private boolean useReplaceOne(long num, Document template) {
+        String threadName = getThreadName();
+        for (long i = 0; i < num; i++) {
+            Document toInsert = new Document(template).append("_id",
+                    threadName + i).append("j", num - i);
+            collection.replaceOne(new Document("_id", threadName + i),
+                    toInsert, UPDATE_WITH_UPSERT);
+        }
+        return true;
+    }
+
+    /**
+     * test the insert performance of multiple thread
+     * 
+     * @param num
+     *            total records
+     * @param size
+     *            size of each record
+     */
     public void curPersist(long num, long randSize, int con) {
         MyThread[] mt = new MyThread[con];
         for (int i = 0; i < con; i++) {
@@ -111,7 +150,37 @@ public class TestMongoDB {
         }
     }
 
-    public void curQuery(long num, long randSize, int con){
+    /**
+     * test the random read performance of single thread
+     * 
+     * @param num
+     *            total records
+     * @param randSize
+     *            size of each record
+     */
+    public void query(long num, long randSize) {
+        long start = System.currentTimeMillis();
+        for (long i = 0; i < randSize; i++) {
+            collection.find(new Document().append("i", rd(num)));
+        }
+        long finish = System.currentTimeMillis();
+        count.getAndIncrement();
+
+        System.out
+                .println("TPS: " + randSize * 1000 / (float) (finish - start));
+    }
+
+    /**
+     * test the random read performance of multiple thread
+     * 
+     * @param num
+     *            total records
+     * @param randSize
+     *            size of each record
+     * @param con
+     *            total threads number
+     */
+    public void curQuery(long num, long randSize, int con) {
         MyThread[] mt = new MyThread[con];
         for (int i = 0; i < con; i++) {
             mt[i] = new MyThread(num, randSize, con);
@@ -121,17 +190,6 @@ public class TestMongoDB {
         for (int i = 0; i < con; i++) {
             mt[i].start();
         }
-    }
-    
-    public void query(long num, long randSize) {
-        long start = System.currentTimeMillis();
-        for(long i=0; i<randSize; i++){
-            dbColl.findOne(new BasicDBObject().append("i", rd(num)));
-        }
-        long finish = System.currentTimeMillis();
-        count.getAndIncrement();
-        
-        System.out.println("TPS: " + randSize * 1000 / (float)(finish - start));
     }
 
     private long rd(long num) {
@@ -150,18 +208,27 @@ public class TestMongoDB {
         }
 
         public void run() {
-            if(isWrite)
+            if (isWrite)
                 persist(num, size);
             else
                 query(num, size);
-            
+
             if (count.get() == con) {
                 long time = System.currentTimeMillis() - startCon;
-                if(isWrite)
-                    System.out.println(num * con * 1000 / (float)time);
+                if (isWrite)
+                    System.out.println(num * con * 1000 / (float) time);
                 else
-                    System.out.println(size * con * 1000 / (float)time);
+                    System.out.println(size * con * 1000 / (float) time);
             }
         }
+    }
+
+    protected String getThreadName() {
+        return Thread.currentThread().getName();
+    }
+
+    public static void main(String[] args) {
+        // new TestMongoDB().persist(100000, 1000);
+        new TestMongoDB().insertDuplicateID();
     }
 }

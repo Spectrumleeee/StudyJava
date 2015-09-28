@@ -1,27 +1,31 @@
-package com.tplink.test.utils;
 /**
  * Copyright (c) 2014, TP-Link Co.,Ltd.
  * Author:  qiaoshikui <qiaoshikui@tp-link.net>
  * Created: 2014-6-26
  */
 
+package com.tplink.test.utils;
 
 import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
-public class ConfigUtils {
-    private static final String CONFIG_FILE_NAME = "sys.properties";
+public class ConfigUtil {
+    private static String configFileName = "sys.properties";
     private static Configuration config;
     
     static {
         try {
-            config = new PropertiesConfiguration(CONFIG_FILE_NAME);
+            config = new PropertiesConfiguration(configFileName);
         } catch (Exception e) {
             throw new RuntimeException("Configuration loading error: "
-                    + "configFileName: " + CONFIG_FILE_NAME, e);
+                    + "configFileName: " + configFileName, e);
         }
+    }
+    
+    public static void setConfigFileName(String fileName){
+        configFileName = fileName;
     }
     
     public static String getString(String key) {

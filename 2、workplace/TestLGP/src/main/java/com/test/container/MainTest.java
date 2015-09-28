@@ -7,7 +7,7 @@
  * wenyong <liguangpu@tp-link.net>
  * Reason: 
  */
-package com.test.container.list.linkedblockingqueue;
+package com.test.container;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;

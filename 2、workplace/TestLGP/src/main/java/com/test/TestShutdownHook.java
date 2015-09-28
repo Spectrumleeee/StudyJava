@@ -17,6 +17,11 @@ public class TestShutdownHook {
         });
     }
     
+    public void testContextClassLoader(){
+        System.out.println(TestContextClassLoader.class.getClassLoader());
+        System.out.println(Thread.currentThread().getContextClassLoader());
+    }
+    
     public static void main(String[] args) {
         // TODO Auto-generated method stub
         Thread thread = new MyThread();

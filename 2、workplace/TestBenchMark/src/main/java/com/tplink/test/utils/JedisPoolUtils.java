@@ -21,10 +21,6 @@ package com.tplink.test.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import com.tplink.test.TestBenchMark.server.ServerStarter;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -39,8 +35,6 @@ import redis.clients.jedis.Protocol;
  */
 public class JedisPoolUtils {
     private static JedisPool pool;
-    private static ResourceBundle bundle = ResourceBundle.getBundle("sys",
-            Locale.getDefault(), ServerStarter.loader);
 
     private static void createJedisPool() {
         JedisPoolConfig config = new JedisPoolConfig();
@@ -49,28 +43,20 @@ public class JedisPoolUtils {
         config.setMaxWaitMillis(2000);
         config.setMinEvictableIdleTimeMillis(3000);
         config.setTimeBetweenEvictionRunsMillis(60000);
-        pool = new JedisPool(config, ConfigUtils.getString("redis.ip"),
-                ConfigUtils.getInt("redis.port"), 5000);
+        pool = new JedisPool(config, ConfigUtil.getString("redis.ip"),
+                ConfigUtil.getInt("redis.port"), 5000);
     }
 
     private static void createJedisPool0() {
-        if (bundle == null) {
-            throw new IllegalArgumentException("[sys.properties] is not found!");
-        }
         JedisPoolConfig config = new JedisPoolConfig();
-        config.setMaxTotal(Integer.valueOf(bundle
-                .getString("redis.pool.maxActive")));
-        config.setMaxIdle(Integer.valueOf(bundle
-                .getString("redis.pool.maxIdle")));
-        config.setMaxWaitMillis(Long.valueOf(bundle
-                .getString("redis.pool.maxWait")));
-        config.setTestOnBorrow(Boolean.valueOf(bundle
-                .getString("redis.pool.testOnBorrow")));
-        config.setTestOnReturn(Boolean.valueOf(bundle
-                .getString("redis.pool.testOnReturn")));
-        pool = new JedisPool(config, bundle.getString("redis.ip"),
-                Integer.valueOf(bundle.getString("redis.port")),
-                Protocol.DEFAULT_TIMEOUT, null, Protocol.DEFAULT_DATABASE);
+        config.setMaxTotal(ConfigUtil.getInt("redis.pool.maxActive"));
+        config.setMaxIdle(ConfigUtil.getInt("redis.pool.maxIdle"));
+        config.setMaxWaitMillis(ConfigUtil.getLong("redis.pool.maxWait"));
+        config.setTestOnBorrow(ConfigUtil.getBoolean("redis.pool.testOnBorrow"));
+        config.setTestOnReturn(ConfigUtil.getBoolean("redis.pool.testOnReturn"));
+        pool = new JedisPool(config, ConfigUtil.getString("redis.ip"),
+                ConfigUtil.getInt("redis.port"), Protocol.DEFAULT_TIMEOUT,
+                null, Protocol.DEFAULT_DATABASE);
     }
 
     private static synchronized void poolInit(boolean auto) {
@@ -87,7 +73,7 @@ public class JedisPoolUtils {
 
     public static Jedis getJedis() {
         if (pool == null)
-            poolInit(ConfigUtils.getBoolean("redis.initPool"));
+            poolInit(ConfigUtil.getBoolean("redis.initPool"));
         return pool.getResource();
     }
 

@@ -19,6 +19,12 @@
         <fileSet>
             <directory>target/bin</directory>
             <outputDirectory>/bin</outputDirectory>
+            <fileMode>0755</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>src/assembly/notes</directory>
+            <outputDirectory>/</outputDirectory>
+            <fileMode>0660</fileMode>
         </fileSet>
     </fileSets>
 </assembly>
