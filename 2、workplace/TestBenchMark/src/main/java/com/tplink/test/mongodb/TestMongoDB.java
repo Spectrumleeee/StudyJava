@@ -16,9 +16,10 @@ import org.slf4j.LoggerFactory;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
 import com.tplink.test.dao.MongoDao;
+import com.tplink.test.factory.TestDBInterface;
 import com.tplink.test.utils.ConfigUtil;
 
-public class TestMongoDB {
+public class TestMongoDB implements TestDBInterface{
     private static final Logger LOGGER = LoggerFactory
             .getLogger(TestMongoDB.class);
     private UpdateOptions UPDATE_WITH_UPSERT = new UpdateOptions().upsert(true);
@@ -44,38 +45,7 @@ public class TestMongoDB {
         }
     }
 
-    public void parseCommandLine(String[] args) {
-        LOGGER.debug(Arrays.toString(args));
-        switch (args[0]) {
-        case "--w":
-            isWrite = true;
-            switch (args.length) {
-            case 3:
-                persist(Long.parseLong(args[2]), Integer.parseInt(args[1]));
-                break;
-            case 4:
-                curPersist(Long.parseLong(args[2]), Integer.parseInt(args[1]),
-                        Integer.parseInt(args[3]));
-                break;
-            default:
-                break;
-            }
-            break;
-        case "--r":
-            isWrite = false;
-            switch (args.length) {
-            case 3:
-                query(Long.parseLong(args[1]), Long.parseLong(args[2]));
-                break;
-            case 4:
-                curQuery(Long.parseLong(args[1]), Long.parseLong(args[2]),
-                        Integer.parseInt(args[3]));
-                break;
-            default:
-                break;
-            }
-        }
-    }
+
 
     public void insertDuplicateID() {
         collection.insertOne(new Document("name", "a"));
@@ -227,8 +197,42 @@ public class TestMongoDB {
         return Thread.currentThread().getName();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] params) {
         // new TestMongoDB().persist(100000, 1000);
         new TestMongoDB().insertDuplicateID();
+    }
+
+    @Override
+    public void parseCommandLine(String[] params) {
+        LOGGER.debug(Arrays.toString(params));
+        switch (params[0]) {
+        case "--w":
+            isWrite = true;
+            switch (params.length) {
+            case 3:
+                persist(Long.parseLong(params[2]), Integer.parseInt(params[1]));
+                break;
+            case 4:
+                curPersist(Long.parseLong(params[2]), Integer.parseInt(params[1]),
+                        Integer.parseInt(params[3]));
+                break;
+            default:
+                break;
+            }
+            break;
+        case "--r":
+            isWrite = false;
+            switch (params.length) {
+            case 3:
+                query(Long.parseLong(params[1]), Long.parseLong(params[2]));
+                break;
+            case 4:
+                curQuery(Long.parseLong(params[1]), Long.parseLong(params[2]),
+                        Integer.parseInt(params[3]));
+                break;
+            default:
+                break;
+            }
+        }
     }
 }

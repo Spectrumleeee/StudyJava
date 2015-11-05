@@ -4,8 +4,6 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import com.tplink.test.mongodb.TestMongoDB;
-
 public class ServerStarter {
     public static ClassLoader loader;
     public static void main(String[] args) {
@@ -28,7 +26,7 @@ public class ServerStarter {
                     .toURL() });
             Thread.currentThread().setContextClassLoader(loader);
 
-            new TestMongoDB().parseCommandLine(args);
+            new TestBenchMarkServer().parseCommandLine(args);
             
         } catch (Exception e) {
             e.printStackTrace();

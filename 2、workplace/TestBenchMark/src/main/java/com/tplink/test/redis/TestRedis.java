@@ -11,24 +11,28 @@ package com.tplink.test.redis;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.tplink.test.factory.TestDBInterface;
 import com.tplink.test.utils.JedisPoolUtils;
 
 import redis.clients.jedis.Jedis;
 
-public class TestRedis {
-    private long start;
+public class TestRedis implements TestDBInterface{
     private AtomicLong count = new AtomicLong(0l);
+    private long startMs;
+    
+    private long payloads;
+    private long totalNums;
+    private int currents;
+    
+    private StringBuilder payloadStr;
     
     public TestRedis(){
+        payloadStr = new StringBuilder();
     }
     
     public TestRedis(boolean usePool) {
     }
     
-    public void parseCommandLine(String[] args) {
-        testSetTPS(Long.parseLong(args[0]), Integer.parseInt(args[1]));
-    }
-
     public void testSetTPS(long nums, int concurrent){
         Thread[] threads = new MyThread[concurrent];
         Jedis[] jediss = new Jedis[concurrent];
@@ -36,19 +40,19 @@ public class TestRedis {
             jediss[i] = JedisPoolUtils.getJedis();
             threads[i] = new MyThread(jediss[i], nums, concurrent);
         }
-        start = System.currentTimeMillis();
+        startMs = System.currentTimeMillis();
         for(int i=0; i<concurrent; i++){
             threads[i].start();
         }
     }
     
     public long set(Jedis jedis, long nums){
-        long startTime = System.currentTimeMillis();
+        long startMsTime = System.currentTimeMillis();
         for(long i=0; i<nums; i++){
-            jedis.set("key"+i, ""+i);
+            jedis.set("key"+i, payloadStr.toString()+i);
         }
         long finishTime = System.currentTimeMillis();
-        return finishTime - startTime;
+        return finishTime - startMsTime;
     }
     
     class MyThread extends Thread{
@@ -66,9 +70,20 @@ public class TestRedis {
             set(jedis, nums);
             JedisPoolUtils.returnRes(jedis);
             if(count.incrementAndGet() == con){
-                long spentTime = System.currentTimeMillis() - start;
+                long spentTime = System.currentTimeMillis() - startMs;
                 System.out.println("TPS : " + nums*con*1000 / spentTime);
             }
         }
+    }
+    
+    @Override
+    public void parseCommandLine(String[] params) {
+        payloads = Long.parseLong(params[0]);
+        for(long i=0; i<payloads; i++){
+            payloadStr.append((char)((int)(Math.random()*26) + 65));
+        }
+        totalNums = Long.parseLong(params[1]);
+        currents = Integer.parseInt(params[2]);
+        testSetTPS(totalNums, currents);
     }
 }
