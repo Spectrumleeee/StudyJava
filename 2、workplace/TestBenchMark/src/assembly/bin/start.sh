@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ $# -eq 0 ] ; then
+	echo "Usage: $0 <mongodb | redis> <--w | --r> <size> <sum> [concurrent] "
+fi
+
 SERVICE_NAME="${project.artifactId}"
 VERSION="${project.version}"
 SERVICE_LIB_NAME=${SERVICE_NAME}-${VERSION}.jar
