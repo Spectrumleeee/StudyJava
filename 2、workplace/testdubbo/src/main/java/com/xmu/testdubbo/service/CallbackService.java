@@ -11,4 +11,5 @@ import com.xmu.testdubbo.callback.CallbackListener;
 public interface CallbackService {
     
     public void sayCallbackService(String request, CallbackListener listener);
+    
 }

@@ -6,7 +6,12 @@
  */
 package com.xmu.testdubbo.consumer;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import com.alibaba.dubbo.rpc.RpcContext;
 import com.xmu.testdubbo.callback.CallbackListener;
+import com.xmu.testdubbo.service.AsyncService;
 import com.xmu.testdubbo.service.CallbackService;
 import com.xmu.testdubbo.service.HelloService;
 
@@ -14,6 +19,7 @@ public class Consumer {
 
     private HelloService helloService;
     private CallbackService callbackService;
+    private AsyncService asyncService;
 
     public void setHelloService(HelloService helloService) {
         this.helloService = helloService;
@@ -21,6 +27,10 @@ public class Consumer {
     
     public void setCallbackService(CallbackService callbackService){
         this.callbackService = callbackService;
+    }
+    
+    public void setAsyncService(AsyncService asyncService){
+        this.asyncService = asyncService;
     }
 
     public void say() {
@@ -35,5 +45,19 @@ public class Consumer {
     
     public void sayCallbackService(String request, CallbackListener listener){
         callbackService.sayCallbackService(request, listener);
+    }
+    
+    public void asyncInvoke() {
+        asyncService.findResponse();
+        Future<String> respFuture = RpcContext.getContext().getFuture();
+        
+        try {
+            String resp = respFuture.get();
+            System.out.println("asyncInvoke response: " + resp);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 }

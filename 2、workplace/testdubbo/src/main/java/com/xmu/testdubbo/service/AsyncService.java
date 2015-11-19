@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2014, TP-Link Co.,Ltd.
  * Author:  liguangpu <liguangpu@tp-link.net>
- * Created: 2015-11-17
+ * Created: 2015-11-19
  *
  */
 package com.xmu.testdubbo.service;
 
-public interface HelloService {
+public interface AsyncService {
     
-    public String sayHello(String request);
+    public String findResponse();
     
 }

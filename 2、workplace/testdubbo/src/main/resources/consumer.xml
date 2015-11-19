@@ -26,11 +26,15 @@
 
     <dubbo:reference id="helloService" interface="com.xmu.testdubbo.service.HelloService" timeout="4000"/>
     <dubbo:reference id="callbackService" interface="com.xmu.testdubbo.service.CallbackService" timeout="4000"/>
+    <dubbo:reference id="asyncService" interface="com.xmu.testdubbo.service.AsyncService" timeout="6000">
+        <dubbo:method name="findResponse" async="true" />
+    </dubbo:reference>
     <!-- End of dubbo config -->
     
     <bean id="consumer" class="com.xmu.testdubbo.consumer.Consumer">
         <property name="helloService" ref="helloService" />
         <property name="callbackService" ref="callbackService" />
+        <property name="asyncService" ref="asyncService" />
     </bean>
     
 </beans>

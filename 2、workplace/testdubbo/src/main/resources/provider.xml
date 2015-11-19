@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
-	xsi:schemaLocation="
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+    xsi:schemaLocation="
            http://www.springframework.org/schema/beans 
            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
            http://www.springframework.org/schema/context
@@ -15,36 +15,42 @@
            http://code.alibabatech.com/schema/dubbo 
            http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
-	<context:property-placeholder location="classpath:sys.properties" />
+    <context:property-placeholder location="classpath:sys.properties" />
 
-	<!-- dubbo config -->
-	<dubbo:application name="testdubbo" />
+    <!-- dubbo config -->
+    <dubbo:application name="testdubbo" />
 
-	<dubbo:registry address="${zookeeper.addr}" />
-	<!-- <dubbo:protocol name="dubbo" port="${dubbo.port}" server="netty" client="netty" 
-		codec="dubbo" serialization="hessian2" charset="UTF-8" threadpool="fixed" 
-		threads="${dubbo.threads}" queues="0" iothreads="9" buffer="8192" accepts="${dubbo.accepts}" 
-		payload="8388608"> </dubbo:protocol> -->
-	<dubbo:protocol name="dubbo" port="${dubbo.port}">
-	</dubbo:protocol>
+    <dubbo:registry address="${zookeeper.addr}" />
+    <!-- <dubbo:protocol name="dubbo" port="${dubbo.port}" server="netty" client="netty" 
+        codec="dubbo" serialization="hessian2" charset="UTF-8" threadpool="fixed" 
+        threads="${dubbo.threads}" queues="0" iothreads="9" buffer="8192" accepts="${dubbo.accepts}" 
+        payload="8388608"> </dubbo:protocol> -->
+    <dubbo:protocol name="dubbo" port="${dubbo.port}">
+    </dubbo:protocol>
 
-	<dubbo:service interface="com.xmu.testdubbo.service.HelloService"
-		ref="helloService" executes="100">
-		<dubbo:method name="sayHello" retries="0" />
-	</dubbo:service>
+    <dubbo:service interface="com.xmu.testdubbo.service.HelloService"
+        ref="helloService" executes="100">
+        <dubbo:method name="sayHello" retries="0" />
+    </dubbo:service>
 
-	<dubbo:service interface="com.xmu.testdubbo.service.CallbackService"
-		ref="callbackService" executes="100">
-		<dubbo:method name="sayCallbackService" retries="0">
-			<dubbo:argument index="1" callback="true" />
-		</dubbo:method>
-	</dubbo:service>
-	<!-- End of dubbo config -->
+    <dubbo:service interface="com.xmu.testdubbo.service.AsyncService"
+        ref="asyncService" executes="100">
+        <dubbo:method name="findResponse" retries="0" />
+    </dubbo:service>
 
-	<bean id="helloService" class="com.xmu.testdubbo.provider.HelloImpl">
-	</bean>
-	
-	<bean id="callbackService" class="com.xmu.testdubbo.provider.CallbackServiceImpl">
+    <dubbo:service interface="com.xmu.testdubbo.service.CallbackService"
+        ref="callbackService" executes="100">
+        <dubbo:method name="sayCallbackService" retries="0">
+            <dubbo:argument index="1" callback="true" />
+        </dubbo:method>
+    </dubbo:service>
+    
+    <!-- End of dubbo config -->
+
+    <bean id="helloService" class="com.xmu.testdubbo.provider.HelloImpl">
     </bean>
-
+    <bean id="asyncService" class="com.xmu.testdubbo.provider.AsyncServiceImpl">
+    </bean>
+    <bean id="callbackService" class="com.xmu.testdubbo.provider.CallbackServiceImpl">
+    </bean>
 </beans>

@@ -17,11 +17,60 @@ import com.xmu.testdubbo.consumer.Consumer;
  * 
  */
 public class ClientStarter {
-    private static ClassPathXmlApplicationContext ctx;
+    private ClassPathXmlApplicationContext ctx;
+    private Consumer consumer;
+    
+    private List<String> responses;
+    private CallbackListener callback;
+    
+    public ClientStarter(){
+        // load spring context
+        ctx = new ClassPathXmlApplicationContext("consumer.xml");
+        consumer = (Consumer) ctx.getBean("consumer");
+        
+        responses = new ArrayList<String>();
+        callback = new CallbackListener() {
+            @Override
+            public void getResponse(String msg) {
+                System.out.println("Recv resp: " + msg);
+                responses.add(msg);
+            }
+        };
+        
+    }
 
+    public void testHelloService(){
+        consumer.say();
+    }
+    
+    public void testAsyncService(){
+        consumer.asyncInvoke();
+    }
+    
+    public void testCallbackService(){
+        for (int i = 1; i <= 10; i++) {
+          consumer.sayCallbackService("hello", callback);
+          consumer.sayCallbackService("time", callback);
+          consumer.sayCallbackService("world-"+i, callback);
+          consumer.sayCallbackService("welcome-"+i, callback);
+      }
+    }
+    
     public static void main(String[] args) throws MalformedURLException,
             InterruptedException {
-
+        InitEnv();
+        
+        ClientStarter client = new ClientStarter();
+        
+        client.testAsyncService();
+//        client.testCallbackService();
+        
+        while (true) {
+            Thread.sleep(5000);
+        }
+    }
+    
+    private static void InitEnv() throws MalformedURLException{
         String confDirStr = System.getProperty("conf.dir", "../conf");
         if(getOs().startsWith("Windows")){
             confDirStr = System.getProperty("conf.dir", "src/main/resources");
@@ -37,33 +86,6 @@ public class ClientStarter {
         ClassLoader loader = new URLClassLoader(new URL[] { confDir.toURI()
                 .toURL() });
         Thread.currentThread().setContextClassLoader(loader);
-
-        // start spring context
-        ctx = new ClassPathXmlApplicationContext("consumer.xml");
-
-        Consumer consumer = (Consumer) ctx.getBean("consumer");
-        // consumer.say();
-
-        final List<String> responses = new ArrayList<String>();
-
-        CallbackListener callback = new CallbackListener() {
-            @Override
-            public void getResponse(String msg) {
-                System.out.println("Recv resp: " + msg);
-                responses.add(msg);
-            }
-        };
-
-        for (int i = 1; i <= 1000; i++) {
-//            consumer.sayCallbackService("hello", callback);
-            consumer.sayCallbackService("time", callback);
-//            consumer.sayCallbackService("world-"+i, callback);
-            consumer.sayCallbackService("welcome-"+i, callback);
-        }
-
-        while (true) {
-            Thread.sleep(5000);
-        }
     }
     
     private static String getOs(){

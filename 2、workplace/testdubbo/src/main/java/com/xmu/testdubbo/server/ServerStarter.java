@@ -7,6 +7,7 @@
 package com.xmu.testdubbo.server;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -15,7 +16,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class ServerStarter {
     public static AbstractApplicationContext context;
-    
+
     public static void main(String[] args) {
         try {
             start();
@@ -27,36 +28,32 @@ public class ServerStarter {
             System.exit(1);
         }
     }
-    
+
     /**
      * Get conf.dir property then load conf files to classpath
      */
     private static void start() throws Exception {
         System.out.println("The cloud-app service is starting.");
-        
-        String confDirStr = System.getProperty("conf.dir", "../conf");
-        if(getOs().startsWith("Windows")){
-            confDirStr = System.getProperty("conf.dir", "src/main/resources");
-        }
 
+        InitEnv();
+        // start spring context
+        context = new ClassPathXmlApplicationContext("provider.xml");
+
+        System.out.println("The cloud-app service started!");
+    }
+
+    private static void InitEnv() throws MalformedURLException {
+        String confDirStr = System.getProperty("conf.dir", "src"
+                + File.separator + "main" + File.separator + "resources");
         File confDir = new File(confDirStr);
         if (!confDir.exists()) {
             throw new RuntimeException("Conf directory "
                     + confDir.getAbsolutePath() + " does not exist.");
         }
-        
+
         // load conf files
-        ClassLoader loader = new URLClassLoader(
-                new URL[] { confDir.toURI().toURL() });
+        ClassLoader loader = new URLClassLoader(new URL[] { confDir.toURI()
+                .toURL() });
         Thread.currentThread().setContextClassLoader(loader);
-        
-        // start spring context
-        context = new ClassPathXmlApplicationContext("provider.xml");
-        
-        System.out.println("The cloud-app service started!");
-    }
-    
-    private static String getOs(){
-        return System.getProperties().getProperty("os.name");
     }
 }
