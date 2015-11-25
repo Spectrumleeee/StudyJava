@@ -1,7 +1,8 @@
 /**
  * Copyright (c) 2014, TP-Link Co.,Ltd.
- * Author: wenyong <wenyong@tp-link.net>
- * Created: 2014-10-31
+ * Author:  liguangpu <liguangpu@tp-link.net>
+ * Created: 2015-11-23
+ *
  */
 
 package com.xmu.lgp.common.zookeeper;

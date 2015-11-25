@@ -1,15 +1,8 @@
 /**
  * Copyright (c) 2014, TP-Link Co.,Ltd.
- * Author: wenyong <wenyong@tp-link.net>
- * Created: 2014-10-31
- */
-
-/**
- * Copyright (c) 2014, TP-Link Co.,Ltd.
- * Author: lukairui <lukairui@tp-link.net>
- * Modified: 2014-09-25
- * Add data to the service address node, to mark whether the node is going 
- *      to shutdown, for elegant shutdown of a service node.
+ * Author:  liguangpu <liguangpu@tp-link.net>
+ * Created: 2015-11-23
+ *
  */
 
 package com.xmu.lgp.common.zookeeper;
