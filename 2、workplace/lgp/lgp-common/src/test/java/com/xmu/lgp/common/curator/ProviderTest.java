@@ -26,11 +26,13 @@ public class ProviderTest {
     
     @Test
     public void test_registerServiceAddress(){
-        provider.deleteNode("/curator/account/172.29.88.115");
+        provider.deleteNode("/curator/account/172.29.88.115", false);
         assertFalse(provider.checkExist("/curator/account/172.29.88.115"));
         provider.registerServiceAddress("account", "172.29.88.115");
         TimeUtil.sleepMils(100);
         assertTrue(provider.checkExist("/curator/account/172.29.88.115"));
         provider.releaseConnection();
+        
+//        TimeUtil.sleepForever();
     }
 }

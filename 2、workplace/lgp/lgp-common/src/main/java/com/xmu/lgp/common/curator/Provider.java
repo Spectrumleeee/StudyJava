@@ -10,6 +10,7 @@ import java.util.HashMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.RetryPolicy;
+import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,13 +47,13 @@ public class Provider extends WatcherCurator {
 
     private void saveServiceInfo(String serviceName, String address) {
         String servicePath = BASE_PATH + NODE_PATH_SEPERATOR + serviceName;
-        createrOrUpdate(servicePath, servicePath);
+        createNode(servicePath, CreateMode.PERSISTENT, servicePath);
         String addressPath = servicePath + NODE_PATH_SEPERATOR + address;
-        String addressCont = 
-                String.format("{\"%s\":\"%s\"}", ILoadBalance.NODE_STATE,
+        String addressCont = String.format("{\"%s\":\"%s\"}",
+                ILoadBalance.NODE_STATE,
                 ILoadBalance.ServerState.ONLINE.getState());
-        createEphemeralNode(addressPath, addressCont);
-//        createrOrUpdate(addressPath, addressCont);
+        // createEphemeralNode(addressPath, addressCont);
+        createNode(addressPath, CreateMode.EPHEMERAL, addressCont);
         logger.debug("Saved service info: {}/{}", serviceName, address);
     }
 }
