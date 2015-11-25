@@ -21,7 +21,7 @@ public class TestCurator {
     static CuratorFramework zkclient = null;
     static String nameSpace = "mongodb/mongos";
     static {
-        String zkhost = "172.29.88.117:2181";
+        String zkhost = "172.31.1.162:2181";
         RetryPolicy rp = new ExponentialBackoffRetry(1000, 3);// 重试机制
         Builder builder = CuratorFrameworkFactory.builder()
                 .connectString(zkhost).connectionTimeoutMs(5000)
