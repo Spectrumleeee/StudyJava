@@ -12,6 +12,9 @@ import com.xmu.testhttpserver.core.impl.HttpHandler;
 
 public class FirstHandler extends HttpHandler{
 
+    /**
+     * Todo what you want
+     */
     @Override
     public void doGet(Request request, Response response) {
         System.out.println("doGet");
@@ -22,14 +25,17 @@ public class FirstHandler extends HttpHandler{
         response.write("helloWorld.....get\n");
     }
 
+    /**
+     * Todo what you want
+     */
     @Override
     public void doPost(Request request, Response response) {
 //        System.out.println("doPost");
 //        System.out.println(request.getRequestBody());
         System.out.println(Thread.currentThread().getName());
-        
+        System.out.println(request.getRequestBody());
 //        response.write("helloWorld.....post\n");
-        response.write("");
+        response.write("OK\n");
     }
 
 }
