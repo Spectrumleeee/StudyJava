@@ -99,7 +99,7 @@ public class CommonDAO extends HibernateDaoSupport {
     /*
      * 保存One端一条记录，Many端也级联save所有相关记录
      */
-    public void saveGroup(Group group) {
+    public void saveGroup0(Group group) {
         Session session = this.getSessionFactory().openSession();
         try {
             session.beginTransaction();
@@ -110,6 +110,18 @@ public class CommonDAO extends HibernateDaoSupport {
             session.getTransaction().rollback();
         } finally {
             session.close();
+        }
+    }
+
+    /*
+     * 使用 HibernateTemplate 完成CURD操作 保存One端一条记录，Many端也级联save所有相关记录
+     */
+    public void saveGroup(Group group) {
+        try {
+            // HibernateTemplate默认自动提交事务的
+            getHibernateTemplate().save(group);
+        } catch (RuntimeException e) {
+            // TODO logger
         }
     }
 
@@ -140,8 +152,9 @@ public class CommonDAO extends HibernateDaoSupport {
         try {
             session.beginTransaction();
             // 1、如果根据ID获取Group对象，delete后，从表执行delete删除所有级联记录
-            Group group = (Group) session.get(Group.class, 1L);
-            // Group group = queryGroupUsers(groupName);
+            // Group group = (Group) session.get(Group.class, 1L);
+            Group group = queryGroupUsers(groupName);
+
             // 2、如果直接new一个Group对象，那么调用delete后，从表中执行update set null而不删除级联记录
             // Group group = new Group();
             // group.setId(1L);
@@ -158,25 +171,31 @@ public class CommonDAO extends HibernateDaoSupport {
     /*
      * hql查询One端，查出Group, 从Group.getUsers()获取所有属于该Group的User
      */
+    @SuppressWarnings("unchecked")
     public Group queryGroupUsers(String groupName) {
         Session session = this.getSession();
         Group group = null;
         try {
             session.beginTransaction();
             // 1、使用Query进行查找
-            // String hql = "from Group as gp where gp.groupName = ?";
-            // Query query = session.createQuery(hql);
-            // query.setParameter(0, groupName);
-            // List<?> groups = query.list();
-            // 2、使用HibernateTemplate.find(hql)进行查找，但不支持惰性加载LAZY
             String hql = "from Group as gp where gp.groupName = ?";
-            List<?> groups = this.getHibernateTemplate().find(hql,
-                    new Object[] { groupName });
-            for (Object rt : groups) {
-                group = (Group) rt;
-                for (User user : group.getUsers()) {
+            List<Group> groups = session.createQuery(hql)
+                    .setParameter(0, groupName).list();
+            // 2、使用HibernateTemplate.find(hql)进行查找，但不支持惰性加载LAZY
+            // String hql = "from Group as gp where gp.groupName = ?";
+            // List<Group> groups = this.getHibernateTemplate().find(hql,
+            // new Object[] { groupName });
+            // 3、使用HibernateTemplate.findByExample,默认left join有重复数据问题
+            // Group example = new Group();
+            // example.setGroupName(groupName);
+            // example.setId(8l);
+            // List<Group> groups =
+            // this.getHibernateTemplate().findByExample(example);
+
+            for (Group gp : groups) {
+                for (User user : gp.getUsers()) {
                     System.out.println(user.getUserName());
-                    user.setUserName(user.getUserName() + " md1");
+                    // user.setUserName(user.getUserName() + " md1");
                 }
             }
             session.getTransaction().commit();
