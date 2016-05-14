@@ -62,7 +62,8 @@ public class ClientStarter {
         
         ClientStarter client = new ClientStarter();
         
-        client.testAsyncService();
+        client.testHelloService();
+//        client.testAsyncService();
 //        client.testCallbackService();
         
         while (true) {

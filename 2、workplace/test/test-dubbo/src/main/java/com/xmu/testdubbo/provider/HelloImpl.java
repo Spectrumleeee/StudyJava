@@ -29,7 +29,7 @@ public class HelloImpl implements HelloService {
     
     public String doHelloResponse(){
         // do sleep
-        sleep(5000);
+//        sleep(5000);
         return "world";
     }
     
