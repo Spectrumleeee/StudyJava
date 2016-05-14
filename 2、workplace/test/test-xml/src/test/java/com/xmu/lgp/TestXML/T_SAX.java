@@ -1,5 +1,6 @@
 package com.xmu.lgp.TestXML;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 
@@ -11,6 +12,8 @@ import com.xmu.lgp.TestXML.TestSAX_University;
 import com.xmu.lgp.entity.Book;
 import com.xmu.lgp.entity.Classes;
 import com.xmu.lgp.entity.College;
+import com.xmu.lgp.entity.Param;
+import com.xmu.lgp.entity.Request;
 import com.xmu.lgp.entity.Student;
 
 /**
@@ -43,6 +46,20 @@ public class T_SAX {
                 for(Student stu : cls.getStudents()){
                     System.out.println("\t\t"+stu.toString());
                 }
+            }
+        }
+    }
+    
+    @Test
+    public void testSAX_request() throws Exception{
+        TestSAX_Request sax = new TestSAX_Request();
+        InputStream in = new FileInputStream("src/main/resources/requests.xml");
+        
+        List<Request> requests = sax.getRequests(in);
+        for(Request request : requests) {
+            System.out.println(request.getMethod());
+            for(Param param : request.getParams()) {
+                System.out.printf("%15s %10s %50s\n", param.getName(), param.getType(), param.getValue());
             }
         }
     }
