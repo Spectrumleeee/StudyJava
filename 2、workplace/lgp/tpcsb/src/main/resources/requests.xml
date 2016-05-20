@@ -1,0 +1,65 @@
+<requests>
+    <!-- Begin of AppService Interfaces -->
+    <request method="getNewestAppVersion">
+        <param name="appPackageName" type="Str" value="com.cloudtest.app1,com.cloudtest.app2,com.cloudtest.app3" />
+        <param name="platform" type="Str" value="IOS,Android" />
+        <param name="locale" type="Str" value="en_US,zh_CN,zh_TW" />
+    </request>
+    <request method="getAppVersions">
+        <param name="appPackageName" type="Str" value="com.cloudtest.app1,com.cloudtest.app2,com.cloudtest.app3" />
+        <param name="versionCode" type="Int" value="1,2,3" />
+        <param name="platform" type="Str" value="IOS,Android" />
+        <param name="locale" type="Str" value="en_US,zh_CN,zh_TW" />
+    </request>
+    <request method="validateAppTcspVer">
+        <param name="tcspVer" type="Str" value="1.0,1.1,1.2" />
+        <param name="appType" type="Str" value="IPC-CLOUD" />
+        <param name="appPackageName" type="Str" value="com.cloudtest.app1,com.cloudtest.app2,com.cloudtest.app3" />
+        <param name="terminalUUID" type="Str" value="1,2,3" />
+    </request>
+    <request method="getAppLegalInfos">
+        <param name="legalKey" type="Str"
+            value="productId-example:privacy_policy:en_US,productId-example:privacy_policy:zh_CN,productId-example:terms_of_use:en_US" />
+    </request>
+    <request method="postPushInfo">
+        <param name="accountId" type="Long" value="1002,1003,1004,1005" />
+        <param name="mobileType" type="Str" value="IOS,Android,Winform" />
+        <param name="appType" type="Str" value="TestApp,TestApp1,TestApp2" />
+        <param name="versionCode" type="Int" value="5,6" />
+        <param name="appPackageName" type="Str" value="com.tplink.cloudrouter" />
+        <param name="deviceToken" type="Str" value="deviceTokenForTest" />
+        <param name="token" type="Str" value="tokenForTest" />
+        <param name="locale" type="Str" value="en_US" />
+    </request>
+    <request method="setBadge">
+        <param name="badge" type="Int" value="9527,9528,9529,100000" />
+        <param name="token" type="Str" value="LOGINTOKEN_SETBADGE,tokenForTest" />
+    </request>
+    <!-- End of AppService Interfaces -->
+
+    <!-- Begin of VaService Interfaces -->
+    <request mehtod="getVaBalance">
+        <param name="deviceId" type="Str" value="FFFF249313C0CFED858FFA634BA883EE0000793C" />
+        <param name="type" type="IntList" value="1000,2000" />
+    </request>
+    <request mehtod="checkVaBalance">
+        <param name="deviceId" type="Str" value="FFFF249313C0CFED858FFA634BA883EE0000793C" />
+        <param name="type" type="IntList" value="1000,2000,3000,4000" />
+    </request>
+    <request mehtod="checkVaToken">
+        <param name="token" type="Str" value="use1|QHKK4371khBlJhKw9w93d3X26208lUHY" />
+    </request>
+    <request method="preDeductVaBalance">
+        <param name="deviceId" type="Str" value="FFFF249313C0CFED858FFA634BA883EE0000793C" />
+        <param name="from" type="Str" value="IPC-CLOUD" />
+        <param name="type" type="Int" value="1000" />
+        <param name="amount" type="Int" value="1" />
+        <param name="token" type="Str" value="use1|QHKK4371khBlJhKw9w93d3X26208lUHY" />
+    </request>
+    <request method="ackDeductVaBalance">
+        <param name="deviceId" type="Str" value="FFFF249313C0CFED858FFA634BA883EE0000793C" />
+        <param name="token" type="Str" value="use1|QHKK4371khBlJhKw9w93d3X26208lUHY" />
+        <param name="ack" type="Int" value="0,1" />
+    </request>
+    <!-- End of VaService Interfaces -->
+</requests>

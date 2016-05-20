@@ -1,0 +1,24 @@
+## method need to test
+method=getVaBalance
+#method=checkVaBalance
+#method=checkVaToken
+#method=preDeductVaBalance
+#method=ackDeductVaBalance
+
+threadcount=10
+operationcount=100000
+
+## AsyncRPC
+tpcs=com.xmu.lgp.tpcsb.services.AsyncRpcTPCS
+rpc.zookeeper.addr=zk://172.31.1.152
+rpc.service.name=vaService
+
+## DubboRPC
+#tpcs=com.xmu.lgp.tpcsb.services.DubboTPCS
+#dubbo.zookeeper.addr=zookeeper://172.31.1.151:2181
+#xml=src/main/resources/requests.xml
+#router=dispatcher|appService|vaService|deviceService
+#reportlatencyforeacherror=true
+
+## Workload
+workload=com.xmu.lgp.tpcsb.workloads.CoreWorkload
