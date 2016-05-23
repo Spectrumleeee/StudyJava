@@ -47,19 +47,31 @@ public class XmlSaxParser extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         if ("request".equals(qName)) {
-            request = new XmlRequest();
-            request.setMethod(attributes.getValue(0));
-            params = new ArrayList<XmlParam>();
+            initXmlRequest(attributes);
         } else if ("param".equals(qName)) {
-            param = new XmlParam();
-            param.setName(attributes.getValue(0));
-            String type = attributes.getValue(1);
-            String values = attributes.getValue(2);
-            param.setType(type);
-            param.setValue(values);
-            setTypeValues(param, type, values);
+            initParam(attributes);
         }
         // System.out.println("Start-"+qName);
+    }
+    
+    private void initXmlRequest(Attributes attributes) {
+        request = new XmlRequest();
+        request.setMethod(attributes.getValue("method"));
+        params = new ArrayList<XmlParam>();
+    }
+    
+    private void initParam(Attributes attributes) {
+        param = new XmlParam();
+        param.setName(attributes.getValue("name"));
+        String type = attributes.getValue("type");
+        String values = attributes.getValue("value");
+        String prefix = attributes.getValue("prefix");
+        if(prefix != null) {
+            param.setPrefix(prefix);
+        }
+        param.setType(type);
+        param.setValue(values);
+        setTypeValues(param, type, values);
     }
 
     private void setTypeValues(XmlParam param, String type, String values) {

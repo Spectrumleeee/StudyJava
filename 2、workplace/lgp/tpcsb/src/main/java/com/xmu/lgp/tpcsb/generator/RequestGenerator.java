@@ -12,7 +12,8 @@ import com.tplink.cloud.api.Request;
 
 public abstract class RequestGenerator extends Generator<Request> {
 
-    protected AtomicInteger id = new AtomicInteger(1);
+    // all the id in multi-thread should be unique
+    protected static AtomicInteger id = new AtomicInteger(0);
 
     @Override
     public Request nextValue() {

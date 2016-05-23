@@ -13,6 +13,7 @@ public class XmlParam {
     private String type;
     private String value;
     private List<?> values;
+    private String prefix;
 
     public String getName() {
         return name;
@@ -44,5 +45,13 @@ public class XmlParam {
 
     public void setValues(List<?> values) {
         this.values = values;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 }

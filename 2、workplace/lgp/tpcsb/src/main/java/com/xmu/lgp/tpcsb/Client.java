@@ -723,13 +723,13 @@ public class Client {
             targetperthreadperms = targetperthread / 1000.0;
         }
 
-        System.out.println("TPCSB Client 0.1");
+        System.out.println("TPCSB Client 0.0.1");
         System.out.print("Command line:");
         for (int i = 0; i < args.length; i++) {
             System.out.print(" " + args[i]);
         }
         System.out.println();
-        System.err.println("Loading workload...");
+        System.out.println("Loading workload...");
 
         // show a warning message that creating the workload is taking a while
         // but only do so if it is taking longer than 2 seconds
@@ -779,7 +779,7 @@ public class Client {
 
         // run the workload
 
-        System.err.println("Starting test.");
+        System.out.println("Starting test.");
 
         int opcount;
         if (dotransactions) {

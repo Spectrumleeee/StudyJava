@@ -13,7 +13,7 @@ import com.tplink.cloud.api.Request;
 public class RequestMaker {
 
     List<Integer> types = new ArrayList<Integer>();
-    String deviceId = "AAAABBBBCCCC0000000000000000000000000006";
+    String deviceId = "AAAABBBBCCCC00000000000000000000000000000006";
     String token = "use1|TestToken$683iCPqe73p10KY4W28595";
     Random random = new Random();
 
@@ -28,7 +28,7 @@ public class RequestMaker {
 
         types.clear();
         types.add(1000);
-        types.add(1001);
+        types.add(2000);
 
         JSONObject params = new JSONObject();
         params.put("deviceId", deviceId);

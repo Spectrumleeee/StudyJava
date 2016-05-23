@@ -22,8 +22,9 @@ import com.xmu.lgp.tpcsb.parser.entity.XmlParam;
 import com.xmu.lgp.tpcsb.parser.entity.XmlRequest;
 
 public class XmlRequestGenerator extends RequestGenerator {
-    private Map<String, XmlRequest> requests;
-    private XmlRequest request;
+    private static final String DEFAULT_XML_PATH = "src/main/resources/requests.xml";
+    private Map<String, XmlRequest> xmlRequests;
+    private XmlRequest xmlRequest;
     private String method;
 
     private Random random;
@@ -31,73 +32,98 @@ public class XmlRequestGenerator extends RequestGenerator {
     public XmlRequestGenerator(String method, String xmlFile) {
         this.method = method;
         this.random = new Random();
-        initXml(xmlFile);
+        initXmlSaxParser(xmlFile);
     }
 
     public XmlRequestGenerator(String method) {
-        this(method, "src/main/resources/requests.xml");
+        this(method, DEFAULT_XML_PATH);
     }
 
-    private void initXml(String xmlFile) {
+    private void initXmlSaxParser(String xmlFile) {
         XmlSaxParser sax = new XmlSaxParser();
         InputStream in;
         try {
             in = new FileInputStream(xmlFile);
-            requests = sax.getRequests(in);
+            xmlRequests = sax.getRequests(in);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        request = requests.get(method);
+        xmlRequest = xmlRequests.get(method);
     }
 
     @Override
     public Request buildRequest() {
         Request ret = new Request();
 
-        ret.setId(id.getAndIncrement());
+        ret.setId(id.incrementAndGet());
         ret.setMethod(method);
-        ret.setParams(buildParams());
+        ret.setParams(buildParams(ret.getId()));
 
         return ret;
     }
 
-    private JSONObject buildParams() {
+    private JSONObject buildParams(long id) {
         JSONObject ret = new JSONObject();
 
-        if (request == null) {
+        if (xmlRequest == null) {
             return ret;
         }
 
-        List<?> values;
-        String type;
-        int choose;
-        for (XmlParam param : request.getParams()) {
-            values = param.getValues();
-            type = param.getType();
-            if (!type.contains("List")) {
-                choose = random.nextInt(values.size());
-                ret.put(param.getName(), values.get(choose));
+        for (XmlParam param : xmlRequest.getParams()) {
+            if(param.getPrefix() != null) {
+                buildParamsIfHasPrefix(ret, param, id);
+                continue;
+            }
+            
+            if (!param.getType().contains("List")) {
+                buildParamsIfNotArray(ret, param);
             } else {
-                if (random.nextInt(10) == 0) {
-                    ret.put(param.getName(), new ArrayList<Integer>());
-                } else {
-                    ret.put(param.getName(), values);
-                }
+                buildParamsIfArray(ret, param);
             }
         }
 
         return ret;
     }
 
+    private JSONObject buildParamsIfHasPrefix(JSONObject inOut, XmlParam param, long id) {
+        inOut.put(param.getName(), param.getPrefix() + id);
+        
+        return inOut;
+    }
+    
+    /**
+     * build field in a request when the filed is not an Array
+     */
+    private JSONObject buildParamsIfNotArray(JSONObject inOut, XmlParam param) {
+        List<?> values = param.getValues();
+        int choose = random.nextInt(values.size());
+        inOut.put(param.getName(), values.get(choose));
+
+        return inOut;
+    }
+
+    /**
+     * build field in a request when the filed is an Array
+     */
+    private JSONObject buildParamsIfArray(JSONObject inOut, XmlParam param) {
+        
+//        inOut.put(param.getName(), param.getValues());
+        
+        if (random.nextInt(10) == 0) {
+            inOut.put(param.getName(), new ArrayList<Integer>());
+        } else {
+            inOut.put(param.getName(), param.getValues());
+        }
+
+        return inOut;
+    }
+
     public static void main(String[] args) {
-        // XmlRequestGenerator generator = new
-        // XmlRequestGenerator("getNewestAppVersion");
-        // XmlRequestGenerator generator = new
-        // XmlRequestGenerator("getAppVersions");
-        XmlRequestGenerator generator = new XmlRequestGenerator("deductVaBalance");
-        // XmlRequestGenerator generator = new
-        // XmlRequestGenerator("checkVaBalance");
+//         XmlRequestGenerator generator = new XmlRequestGenerator("getNewestAppVersion");
+//         XmlRequestGenerator generator = new XmlRequestGenerator("getAppVersions");
+//         XmlRequestGenerator generator = new XmlRequestGenerator("preDeductVaBalance");
+        XmlRequestGenerator generator = new XmlRequestGenerator("ackDeductVaBalance");
         for (int i = 0; i < 100; i++) {
             System.out.println(generator.nextValue());
         }

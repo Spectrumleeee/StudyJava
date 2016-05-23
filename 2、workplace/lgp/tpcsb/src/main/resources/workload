@@ -1,16 +1,16 @@
 ## method need to test
-method=getVaBalance
+#method=getVaBalance
 #method=checkVaBalance
 #method=checkVaToken
 #method=preDeductVaBalance
-#method=ackDeductVaBalance
+method=ackDeductVaBalance
 
 threadcount=10
-operationcount=100000
+operationcount=2000
 
 ## AsyncRPC
 tpcs=com.xmu.lgp.tpcsb.services.AsyncRpcTPCS
-rpc.zookeeper.addr=zk://172.31.1.152
+rpc.zookeeper.addr=zk://172.31.1.162
 rpc.service.name=vaService
 
 ## DubboRPC

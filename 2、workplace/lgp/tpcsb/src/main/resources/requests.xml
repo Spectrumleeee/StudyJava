@@ -38,27 +38,27 @@
     <!-- End of AppService Interfaces -->
 
     <!-- Begin of VaService Interfaces -->
-    <request mehtod="getVaBalance">
-        <param name="deviceId" type="Str" value="FFFF249313C0CFED858FFA634BA883EE0000793C" />
+    <request method="getVaBalance">
+        <param name="deviceId" type="Str" value="AAAABBBBCCCC00000000000000000000000000000006" />
         <param name="type" type="IntList" value="1000,2000" />
     </request>
-    <request mehtod="checkVaBalance">
-        <param name="deviceId" type="Str" value="FFFF249313C0CFED858FFA634BA883EE0000793C" />
-        <param name="type" type="IntList" value="1000,2000,3000,4000" />
+    <request method="checkVaBalance">
+        <param name="deviceId" type="Str" value="AAAABBBBCCCC00000000000000000000000000000006" />
+        <param name="type" type="IntList" value="1000,2000" />
     </request>
-    <request mehtod="checkVaToken">
+    <request method="checkVaToken">
         <param name="token" type="Str" value="use1|QHKK4371khBlJhKw9w93d3X26208lUHY" />
     </request>
     <request method="preDeductVaBalance">
-        <param name="deviceId" type="Str" value="FFFF249313C0CFED858FFA634BA883EE0000793C" />
+        <param name="deviceId" type="Str" value="AAAABBBBCCCC00000000000000000000000000000006"/>
         <param name="from" type="Str" value="IPC-CLOUD" />
         <param name="type" type="Int" value="1000" />
         <param name="amount" type="Int" value="1" />
-        <param name="token" type="Str" value="use1|QHKK4371khBlJhKw9w93d3X26208lUHY" />
+        <param name="token" type="Str" value="use1|QHKK4371khBlJhKw9w93d3X26208lUHY" prefix="use1|token-"/>
     </request>
     <request method="ackDeductVaBalance">
-        <param name="deviceId" type="Str" value="FFFF249313C0CFED858FFA634BA883EE0000793C" />
-        <param name="token" type="Str" value="use1|QHKK4371khBlJhKw9w93d3X26208lUHY" />
+        <param name="deviceId" type="Str" value="AAAABBBBCCCC00000000000000000000000000000006"/>
+        <param name="token" type="Str" value="use1|QHKK4371khBlJhKw9w93d3X26208lUHY" prefix="use1|token-"/>
         <param name="ack" type="Int" value="0,1" />
     </request>
     <!-- End of VaService Interfaces -->
