@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# ./start.sh -p method="checkVaBalance"
+
 SERVICE_NAME="${project.artifactId}"
 VERSION="${project.version}"
 SERVICE_FULL_NAME=$SERVICE_NAME-$VERSION
