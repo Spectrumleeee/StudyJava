@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ./start.sh -p method="checkVaBalance"
+# ./start.sh <method> <operationcount> <threadcount>         ex: ./start.sh checkVaBalance 100000 10
 
 SERVICE_NAME="${project.artifactId}"
 VERSION="${project.version}"
@@ -16,6 +16,6 @@ PRO_LOGS_DIR=$PRO_BASE_DIR/logs
 JAVA_OPTS="-server -Xms2048m -Xmx2048m -XX:PermSize=128m -XX:MaxPermSize=128m"	# PRD JVM CONFIG 
 #JAVA_OPTS="-server -Xms128m -Xmx256m -XX:PermSize=32m -XX:MaxPermSize=32m"		# UAT JVM CONFIG 
 
-java ${JAVA_OPTS} -jar ${PRO_LIB_DIR}/${SERVICE_LIB_NAME} -P ${PRO_CONF_DIR}/workload -X ${PRO_CONF_DIR}/requests.xml -s $*
+java ${JAVA_OPTS} -jar ${PRO_LIB_DIR}/${SERVICE_LIB_NAME} -P ${PRO_CONF_DIR}/workload-vaservice -X ${PRO_CONF_DIR}/requests.xml -s -p method=$1 -p operationcount=$2 -p threadcount=$3
 
 

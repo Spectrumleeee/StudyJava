@@ -17,43 +17,55 @@
  *  under the License.
  *
  */
-package com.test.jedis;
+package com.test.database.jedis.pool;
 
-import java.util.ResourceBundle;
-
-import redis.clients.jedis.Jedis;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * TestCase.java
+ * BattlePlane.java
  *
  * Copyright (c) 2014, TP-Link Co.,Ltd.
  * Author: liguangpu <liguangpu@tp-link.net>
- * Created: Jan 19, 2015
+ * Created: Feb 3, 2015
  */
-public abstract class TestCase {
-    
-    protected static ResourceBundle bundle;
-    protected static Jedis _jedis;
-    
-    public TestCase(){
-        bundle = ResourceBundle.getBundle("shardedJedisPool");
-        _jedis = new Jedis(bundle.getString("redis1.ip"), 8889);
+public class BattlePlane {
+    private static final AtomicLong counter = new AtomicLong(0);
+    private String name;
+    private int weight;
+    private int size;
+    private boolean takeOff = false;
+
+    public BattlePlane(String name, int weight, int size){
+        this.name = name + "-" + counter.getAndIncrement();
+        this.weight = weight;
+        this.size = size;
     }
     
-    public void startTest(){
-        System.out.println(">>>>>>>>>>>>>>>> START TESTING <<<<<<<<<<<<<<<<");
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getSize() {
+        return size;
     }
     
-    public void finishTest(){
-        System.out.println(">>>>>>>>>>>>>>>> STOP  TESTING <<<<<<<<<<<<<<<<");
+    public void setSize(int size) {
+        this.size = size;
     }
-    
-    public void call(){
-        startTest();
-        specifiedMethod();
-        finishTest();
-        _jedis.close();
+
+    public boolean isTakeOff() {
+        return takeOff;
     }
-    
-    public abstract void specifiedMethod();
+
+    public void setTakeOff(boolean takeOff) {
+        this.takeOff = takeOff;
+    }
 }

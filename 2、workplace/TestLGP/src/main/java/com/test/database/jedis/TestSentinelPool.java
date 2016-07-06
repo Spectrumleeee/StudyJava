@@ -4,7 +4,7 @@
  * Created: 2015-9-15
  *
  */
-package com.test.jedis;
+package com.test.database.jedis;
 
 public class TestSentinelPool {
 

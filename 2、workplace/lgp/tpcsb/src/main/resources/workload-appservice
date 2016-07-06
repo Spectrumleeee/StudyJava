@@ -1,17 +1,18 @@
 ## appService methods
-method=getNewestAppVersion
+#method=getNewestAppVersion
 #method=getAppVersions
 #method=validateAppTcspVer
 #method=getAppLegalInfos
 #method=postPushInfo
 #method=setBadge
+method=getDstRule
 
 threadcount=1
 operationcount=5
 
 ## AsyncRPC
 tpcs=com.xmu.lgp.tpcsb.services.AsyncRpcTPCS
-rpc.zookeeper.addr=zk://172.29.88.115:2181
+rpc.zookeeper.addr=zk://172.31.1.151:2181
 rpc.service.name=appService
 
 ## DubboRPC

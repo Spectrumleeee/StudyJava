@@ -17,23 +17,21 @@
  *  under the License.
  *
  */
-package com.test.jedis;
+package com.test.database.jedis.pool;
+
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 /**
- * TestJedisCluster.java
+ * BattlePlaneConfig.java
  *
  * Copyright (c) 2014, TP-Link Co.,Ltd.
  * Author: liguangpu <liguangpu@tp-link.net>
- * Created: Jan 21, 2015
+ * Created: Feb 3, 2015
  */
-public class TestJedisCluster {
-
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        // TODO Auto-generated method stub
-
+public class BattlePlaneConfig extends GenericObjectPoolConfig{
+    public BattlePlaneConfig(){
+        setMaxTotal(10);
+        setMaxIdle(10);
+        setMinIdle(5);
     }
-
 }

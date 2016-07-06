@@ -17,29 +17,43 @@
  *  under the License.
  *
  */
-package com.test.jedis.pool;
+package com.test.database.jedis;
+
+import java.util.ResourceBundle;
+
+import redis.clients.jedis.Jedis;
 
 /**
- * BattlePlaneException.java
+ * TestCase.java
  *
  * Copyright (c) 2014, TP-Link Co.,Ltd.
  * Author: liguangpu <liguangpu@tp-link.net>
- * Created: Feb 3, 2015
+ * Created: Jan 19, 2015
  */
-public class BattlePlaneException extends RuntimeException {
+public abstract class TestCase {
     
-    private static final long serialVersionUID = -8216299259676657509L;
-
-    public BattlePlaneException(Throwable e){
-        super(e);
+    protected static ResourceBundle bundle;
+    protected static Jedis _jedis;
+    
+    public TestCase(){
+        bundle = ResourceBundle.getBundle("shardedJedisPool");
+        _jedis = new Jedis(bundle.getString("redis1.ip"), 8889);
     }
     
-    public BattlePlaneException(String message){
-        super(message);
+    public void startTest(){
+        System.out.println(">>>>>>>>>>>>>>>> START TESTING <<<<<<<<<<<<<<<<");
     }
     
-    public BattlePlaneException(String message, Throwable e){
-        super(message, e);
+    public void finishTest(){
+        System.out.println(">>>>>>>>>>>>>>>> STOP  TESTING <<<<<<<<<<<<<<<<");
     }
     
+    public void call(){
+        startTest();
+        specifiedMethod();
+        finishTest();
+        _jedis.close();
+    }
+    
+    public abstract void specifiedMethod();
 }

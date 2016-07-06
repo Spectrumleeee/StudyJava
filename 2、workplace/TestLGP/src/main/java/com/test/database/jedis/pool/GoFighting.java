@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package com.test.jedis.pool;
+package com.test.database.jedis.pool;
 
 /**
  * GoFighting.java

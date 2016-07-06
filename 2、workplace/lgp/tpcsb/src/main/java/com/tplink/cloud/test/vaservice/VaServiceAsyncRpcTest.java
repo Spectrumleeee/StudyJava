@@ -9,7 +9,7 @@ import com.tplink.cloud.rpc.Refer;
 import com.tplink.cloud.test.vaservice.request.RequestMaker;
 
 public class VaServiceAsyncRpcTest {
-    private static final String DEFAULT_ZKURL = "zk://172.31.1.162";
+    private static final String DEFAULT_ZKURL = "zk://172.31.1.151";
     private String service;
     private String zkUrl;
     private Application app;
@@ -84,9 +84,9 @@ public class VaServiceAsyncRpcTest {
         @SuppressWarnings("resource")
         Scanner scanner = new Scanner(System.in);
 
-        System.out
-                .println("1 checkVaBalance\t2 predeductVaBalance\t3 ackDedeductVaBalance\t4 checkVaToken\t5 getVaBalance\t0 exit!\t");
-        System.out.println("Input a num:");
+        System.out.print("1、checkVaBalance  2、predeductVaBalance  3、ackDedeductVaBalance  ");
+        System.out.println("4、checkVaToken  5、getVaBalance  0、exit!  ");
+        System.out.print("Input a num: ");
         int i = 1;
         while (true) {
             int choose = scanner.nextInt();
@@ -116,8 +116,9 @@ public class VaServiceAsyncRpcTest {
             }
 
             if (i % 5 == 0) {
-                System.out
-                        .println("1 checkVaBalance\t2 predeductVaBalance\t3 ackDedeductVaBalance\t4 checkVaToken\t5 getVaBalance\t0 exit!\t");
+                System.out.print("1、checkVaBalance  2、predeductVaBalance  3、ackDedeductVaBalance  ");
+                System.out.println("4、checkVaToken  5、getVaBalance  0、exit!  ");
+                System.out.print("Input a num: ");
             }
             i++;
         }

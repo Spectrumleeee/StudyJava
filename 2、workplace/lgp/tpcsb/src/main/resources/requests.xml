@@ -21,6 +21,10 @@
         <param name="legalKey" type="Str"
             value="productId-example:privacy_policy:en_US,productId-example:privacy_policy:zh_CN,productId-example:terms_of_use:en_US" />
     </request>
+    <request method="getDstRule">
+        <param name="zoneId" type="Str" value="Paris" />
+        <param name="deviceId" type="Str" value="AAAAAABBBBBCCCCCDDDDDEEEEEFFFFFGGGGGHHHHH" />
+    </request>
     <request method="postPushInfo">
         <param name="accountId" type="Long" value="1002,1003,1004,1005" />
         <param name="mobileType" type="Str" value="IOS,Android,Winform" />

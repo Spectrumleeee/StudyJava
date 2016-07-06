@@ -17,55 +17,29 @@
  *  under the License.
  *
  */
-package com.test.jedis.pool;
-
-import java.util.concurrent.atomic.AtomicLong;
+package com.test.database.jedis.pool;
 
 /**
- * BattlePlane.java
+ * BattlePlaneException.java
  *
  * Copyright (c) 2014, TP-Link Co.,Ltd.
  * Author: liguangpu <liguangpu@tp-link.net>
  * Created: Feb 3, 2015
  */
-public class BattlePlane {
-    private static final AtomicLong counter = new AtomicLong(0);
-    private String name;
-    private int weight;
-    private int size;
-    private boolean takeOff = false;
+public class BattlePlaneException extends RuntimeException {
+    
+    private static final long serialVersionUID = -8216299259676657509L;
 
-    public BattlePlane(String name, int weight, int size){
-        this.name = name + "-" + counter.getAndIncrement();
-        this.weight = weight;
-        this.size = size;
+    public BattlePlaneException(Throwable e){
+        super(e);
     }
     
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getSize() {
-        return size;
+    public BattlePlaneException(String message){
+        super(message);
     }
     
-    public void setSize(int size) {
-        this.size = size;
+    public BattlePlaneException(String message, Throwable e){
+        super(message, e);
     }
-
-    public boolean isTakeOff() {
-        return takeOff;
-    }
-
-    public void setTakeOff(boolean takeOff) {
-        this.takeOff = takeOff;
-    }
+    
 }

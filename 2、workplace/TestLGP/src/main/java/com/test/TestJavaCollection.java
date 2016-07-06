@@ -22,7 +22,7 @@ package com.test;
 import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import com.test.jedis.TestCase;
+import com.test.database.jedis.TestCase;
 import com.test.utils.Person;
 
 /**

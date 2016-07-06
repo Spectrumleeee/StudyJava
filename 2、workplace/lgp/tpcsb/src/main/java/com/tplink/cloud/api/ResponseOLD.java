@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2016, TP-Link Co.,Ltd.
+ * Author:  liguangpu <liguangpu@tp-link.net>
+ * Created: 2016-3-28
+ *
+ */
 package com.tplink.cloud.api;
 
 import java.io.Serializable;
@@ -5,36 +11,29 @@ import java.io.Serializable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.tplink.cloud.api.trace.ModuleTrace;
-import com.tplink.cloud.api.trace.Trace;
+public class ResponseOLD implements Serializable {
 
-public class Response implements Serializable {
     private static final long serialVersionUID = 8861861810300198850L;
     private long id = 0;
     private int errorCode = 0;
     private String result = null;
-    private Trace trace = null;
 
-    public Response() {
-        this.trace = new Trace();
+    public ResponseOLD() {
     }
 
-    public Response(long id) {
+    public ResponseOLD(long id) {
         this.id = id;
-        this.trace = new Trace();
     }
 
-    public Response(long id, ErrorCode errorCode) {
+    public ResponseOLD(long id, ErrorCode errorCode) {
         this.id = id;
         this.errorCode = errorCode.getCode();
-        this.trace = new Trace();
     }
 
-    public Response(long id, ErrorCode errorCode, JSONObject obj) {
+    public ResponseOLD(long id, ErrorCode errorCode, JSONObject obj) {
         this.id = id;
         this.errorCode = errorCode.getCode();
         this.result = obj.toString();
-        this.trace = new Trace();
     }
 
     public long getId() {
@@ -90,7 +89,6 @@ public class Response implements Serializable {
         return object;
     }
 
-    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
@@ -105,37 +103,5 @@ public class Response implements Serializable {
         }
         sb.append("}");
         return sb.toString();
-    }
-
-    public void appendModuleTrace(ModuleTrace moduleTrace) {
-        // Forward compatibility, for elder backward services.
-        if (null == trace) {
-            trace = new Trace();
-        }
-        trace.appendModuleTrace(moduleTrace);
-    }
-
-    public void appendSubTrace(Trace nextSubTrace) {
-        // Forward compatibility, for elder backward services.
-        if (null == trace) {
-            trace = new Trace();
-        }
-        trace.appendSubTrace(nextSubTrace);
-    }
-
-    public void appendTrace(Trace nextTrace) {
-        // Forward compatibility, for elder backward services.
-        if (null == trace) {
-            trace = new Trace();
-        }
-        trace.appendTrace(nextTrace);
-    }
-
-    public Trace getTrace() {
-        // Forward compatibility, for elder backward services.
-        if (null == trace) {
-            trace = new Trace();
-        }
-        return trace;
     }
 }

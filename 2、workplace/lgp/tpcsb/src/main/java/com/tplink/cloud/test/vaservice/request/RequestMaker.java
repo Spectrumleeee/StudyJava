@@ -9,6 +9,7 @@ import java.util.Random;
 import org.json.JSONObject;
 
 import com.tplink.cloud.api.Request;
+import com.tplink.cloud.test.RequestUtils;
 
 public class RequestMaker {
 
@@ -22,9 +23,7 @@ public class RequestMaker {
     }
 
     public Request makeCheckVaBalance() {
-        Request request = new Request();
-        request.setId(9527l);
-        request.setMethod("checkVaBalance");
+        Request request = RequestUtils.getVaServiceRequest("checkVaBalance");
 
         types.clear();
         types.add(1000);
@@ -39,9 +38,7 @@ public class RequestMaker {
     }
 
     public Request makePreDeductVaBalance() {
-        Request request = new Request();
-        request.setId(9528l);
-        request.setMethod("preDeductVaBalance");
+        Request request = RequestUtils.getVaServiceRequest("preDeductVaBalance");
 
         JSONObject params = new JSONObject();
         params.put("deviceId", deviceId);
@@ -55,9 +52,7 @@ public class RequestMaker {
     }
 
     public Request makeAckDeductVaBalance() {
-        Request request = new Request();
-        request.setId(9529l);
-        request.setMethod("ackDeductVaBalance");
+        Request request = RequestUtils.getVaServiceRequest("ackDeductVaBalance");
 
         JSONObject params = new JSONObject();
         params.put("deviceId", deviceId);
@@ -69,9 +64,7 @@ public class RequestMaker {
     }
 
     public Request makeCheckVaToken() {
-        Request request = new Request();
-        request.setId(9530l);
-        request.setMethod("checkVaToken");
+        Request request = RequestUtils.getVaServiceRequest("checkVaToken");
 
         JSONObject params = new JSONObject();
         params.put("token", token);
@@ -81,9 +74,7 @@ public class RequestMaker {
     }
 
     public Request makeGetVaBalance() {
-        Request request = new Request();
-        request.setId(9530l);
-        request.setMethod("getVaBalance");
+        Request request = RequestUtils.getVaServiceRequest("getVaBalance");
 
         types.clear();
 

@@ -4,7 +4,7 @@
  * Created: 2015-9-21
  *
  */
-package com.test.cassandra;
+package com.test.database.cassandra;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Metadata;

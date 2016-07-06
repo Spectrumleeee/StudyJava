@@ -17,7 +17,7 @@
  *  under the License.
  *
  */
-package com.test.jedis;
+package com.test.database.jedis;
 
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
